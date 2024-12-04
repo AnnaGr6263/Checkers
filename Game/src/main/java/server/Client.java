@@ -14,6 +14,27 @@ public class Client {
             // Inicjalizacja  odbierania z serwera
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+            // Watek odbierajacy z serwera
+            Thread receiverThread = new Thread(() -> {
+                try {
+                    String serverMessage;
+                    while ((serverMessage = in.readLine()) != null) {
+                        System.out.println("From server: " + serverMessage);
+                        System.out.println("Enter text: ");
+                    }
+                } catch (IOException ex) {
+                    System.out.println("Connection closed by server.");
+                }finally {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        System.out.println("Error closing socket: " + e.getMessage());
+                    }
+                    System.exit(0);
+                }
+            });
+            receiverThread.start();
+
             // Wpisanie textu przez konsole
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
             String text;
@@ -23,8 +44,6 @@ public class Client {
                 text = bufferRead.readLine();
                 // Wysylanie do serwera
                 out.println(text);
-                // Odbieranie z serwera
-                System.out.println(in.readLine());
 
             } while (!text.equals("bye"));
             socket.close();
