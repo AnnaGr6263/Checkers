@@ -1,0 +1,2 @@
+# Checkers
+Chinese Checkers project
