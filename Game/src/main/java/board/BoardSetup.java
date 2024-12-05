@@ -2,8 +2,9 @@ package board;
 
 public abstract class BoardSetup {
 
+    abstract void boardGenerator();
 
-    abstract void centerGenerator();
-    abstract void cornersGenerator();
+    //returns field with specified coordinates
+    public abstract Field getSpecificField(int row, int column);
 }
 

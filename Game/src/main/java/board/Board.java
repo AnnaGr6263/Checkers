@@ -11,9 +11,8 @@ public class Board {
         this.boardSetup = boardSetup;
     }
 
-    public void genrateCenter(BoardSetup boardSetup) {
-        boardSetup.centerGenerator();
-        boardSetup.cornersGenerator();
+    public void genrateTheWholeBoard(BoardSetup boardSetup) {
+        boardSetup.boardGenerator();
     }
 
 }
