@@ -2,9 +2,15 @@ package server;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Server {
+    private static final int MAX_CLIENTS = 6;
+    private static final AtomicInteger connectedClients = new AtomicInteger(0);
+    private static final List<Mediator> mediators = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -14,14 +20,32 @@ public class Server {
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("New client connected");
+                if (connectedClients.get() >= MAX_CLIENTS) {
+                    System.out.println("Max clients reached. Rejecting new client...");
+                    rejectClient(socket);
+                    continue;
+                }
 
-                new Mediator(socket).start();
+                connectedClients.incrementAndGet();
+                System.out.println("New client connected. Total clients: " + connectedClients.get());
+
+                Mediator mediator = new Mediator(socket, mediators, connectedClients);
+                mediators.add(mediator);
+                mediator.start();
             }
-
         } catch (IOException ex) {
             System.out.println("Server exception: " + ex.getMessage());
             ex.printStackTrace();
+        }
+    }
+
+    private static void rejectClient(Socket socket) {
+        try {
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            out.println("Server is full. Connection rejected.");
+            socket.close();
+        } catch (IOException ex) {
+            System.out.println("Error rejecting client: " + ex.getMessage());
         }
     }
 }
