@@ -1,69 +1,53 @@
 package server;
 
-import java.util.List;
 import java.io.*;
-import java.net.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.net.Socket;
+
+// Klasa Mediator: odpowiada za połączenie z jednym klientem.
+// Przesyła wiadomości od klienta do serwera i odwrotnie.
 
 public class Mediator extends Thread {
-    private Socket socket;
-    private List<Mediator> mediators;
-    private AtomicInteger connectedClients;
-    private PrintWriter out;
+    private final Socket socket; // Połączenie z klientem
+    private PrintWriter out; // Strumień wyjściowy do klienta
 
-    public Mediator(Socket socket, List<Mediator> mediators, AtomicInteger connectedClients) {
+    public Mediator(Socket socket) {
         this.socket = socket;
-        this.mediators = mediators;
-        this.connectedClients = connectedClients;
-
         try {
-            OutputStream output = socket.getOutputStream();
-            this.out = new PrintWriter(output, true);
+            // Inicjalizacja strumienia wyjściowego
+            this.out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException ex) {
             System.out.println("Error initializing PrintWriter: " + ex.getMessage());
         }
     }
 
+    @Override
     public void run() {
-
-        try {
-            //Inicjalizacja  odbierania od socketa
-            InputStream input = socket.getInputStream();
-            BufferedReader in = new BufferedReader(new InputStreamReader(input));
-
-            String line;
-            do {
-                // Odbieranie od socketa
-                line = in.readLine();
-                if (line != null) {
-                    System.out.println("Received: " + line);
-                    broadcastMessage(line);
-                }
-
-            } while (!line.equals("bye"));
-
-            socket.close();
-        } catch (IOException ex) {
-            System.out.println("Server exception: " + ex.getMessage());
-            ex.printStackTrace();
-        }finally {
-            connectedClients.decrementAndGet();
-            mediators.remove(this);
-            System.out.println("Client disconnected. Remaining clients: " + connectedClients.get());
-        }
-    }
-
-    private void broadcastMessage(String message) {
-        for (Mediator mediator : mediators) {
-            if (mediator != this) {
-                mediator.sendMessage(message);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            String message;
+            // Odbieranie wiadomości od klienta
+            while ((message = in.readLine()) != null) {
+                System.out.println("Received: " + message);
+                Server.broadcastMessage(message, this); // Przekazywanie wiadomości do serwera
             }
+        } catch (IOException ex) {
+            System.out.println("Client disconnected: " + ex.getMessage());
+        } finally {
+            Server.removeMediator(this); // Usunięcie mediatora po rozłączeniu klienta
+            closeSocket();
         }
     }
 
-    private void sendMessage(String message) {
+    public void sendMessage(String message) {
         if (out != null) {
-            out.println(message);
+            out.println(message); // Wysyłanie wiadomości do klienta
+        }
+    }
+
+    private void closeSocket() {
+        try {
+            socket.close(); // Zamknięcie połączenia z klientem
+        } catch (IOException ex) {
+            System.out.println("Error closing socket: " + ex.getMessage());
         }
     }
 }
