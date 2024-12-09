@@ -2,9 +2,9 @@ package board;
 
 public class Field {
 
-    private boolean inStar = false;        //is a field filled with a pawn or no
-    private int col;                        //column
-    private int row;                        //row
+    private boolean inStar = false;         // Is a filed in a Star or not
+    private int col;                        // Column
+    private int row;                        // Row
 
     public Field(int row, int col) {
         this.col = col;
