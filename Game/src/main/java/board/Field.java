@@ -2,7 +2,7 @@ package board;
 
 public class Field {
 
-    private boolean inStar = false;         // Is a filed in a Star or not
+    private boolean inStar = false;         // Is a field in a Star or not
     private int col;                        // Column
     private int row;                        // Row
 

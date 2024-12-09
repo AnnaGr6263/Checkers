@@ -1,5 +1,7 @@
 package server;
 
+import board.BoardSetup;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -15,9 +17,14 @@ public class Server {
     private static final AtomicInteger connectedClients = new AtomicInteger(0); // Liczba aktywnych klientów
     private static final List<Mediator> mediators = new CopyOnWriteArrayList<>(); // Lista mediatorów obsługujących klientów
 
+    public static BoardSetup board;
+
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(4444)) {
             System.out.println("Server is listening on port 4444");
+
+            ChooseBoard chooseBoard = ChooseBoard.getInstance();
+            board = chooseBoard.choice();     // Wybranie planszy
 
             while (true) {
                 Socket socket = serverSocket.accept();
