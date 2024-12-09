@@ -1,11 +1,13 @@
 package server;
 
 import board.BoardSetup;
+import board.Field;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
-    private BoardSetup board; // Plansza gry
+    private BoardSetup board;       // Plansza gry
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
     private final List<Mediator> players = new ArrayList<>(); // Lista graczy
     private boolean gameStarted = false;
@@ -14,9 +16,10 @@ public class GameManager {
         observers.add(observer);
     }
 
+    /*
     public void removeObserver(Observer observer) {
         observers.remove(observer);
-    }
+    }*/
 
     private void notifyObservers(String message) {
         for (Observer observer : new ArrayList<>(observers)) {
@@ -40,17 +43,21 @@ public class GameManager {
     }
 
     public synchronized void handleCommand(Mediator player, String command) {
-        if (command.equalsIgnoreCase("join")) {
+
+        String[] elementsOfCommand = command.split(" ");
+
+        if(command.equals("join")) {
             addPlayer(player);
-        } else if (command.equalsIgnoreCase("game start")) {
+        } else if (command.equals("game start")) {
             startGame(player);
-        } else if (command.startsWith("choose board")) {
+        } else if (elementsOfCommand[0].equals("choose") && elementsOfCommand[1].equals("board")) {
             chooseBoard(player, command);
-        } else if (command.matches("[0-16]x[0-24]->[0-16]x[0-24]")) { // TO DO - NAPRAWIC
+        } else if (elementsOfCommand[0].equals("move")) {
             processMove(player, command);
         } else {
             player.sendMessage("Invalid command: " + command);
         }
+
     }
 
     private void startGame(Mediator sender) {
@@ -80,20 +87,57 @@ public class GameManager {
             player.sendMessage("Board has already been chosen.");
             return;
         }
-        if (command.equalsIgnoreCase("choose board big")) {
-            ChooseBoard.getInstance().choose(1); // Wybór BigBoard
+        if (command.equals("choose board BigBoard")) {
+            board = ChooseBoard.getInstance().choose(1);    // Wybór BigBoard
             notifyObservers("Board chosen: Big Board (16x24).");
         } else {
-            player.sendMessage("Invalid board selection. Use 'choose board big'.");
+            player.sendMessage("Invalid board selection. Use 'choose board BigBoard'.");
         }
     }
 
 
-    private void processMove(Mediator player, String move) {
+    private void processMove(Mediator player, String command) {
         if (!gameStarted) {
             player.sendMessage("Game has not started yet.");
             return;
         }
-        notifyObservers("Player move: " + move);
+
+        String[] commandWithoutWordMove = command.split(" ");
+        String move = commandWithoutWordMove[1];
+
+        String[] moveParts = move.split("->");
+
+        if(moveParts.length > 2) {
+            player.sendMessage("Invalid move. Used '->' more than once");
+        }
+
+        String start = moveParts[0];
+        String[] startCo = start.split("x");      // Współrzędne pola początkowego
+
+        String rowStartField = startCo[0];
+        int rowSF = Integer.parseInt(rowStartField);
+        String colStartField = startCo[1];
+        int colSF = Integer.parseInt(colStartField);
+
+        String end = moveParts[1];
+        String[] endCo = end.split("x");      // Współrzędne pola końcowego
+
+        String rowEndField = endCo[0];
+        int rowEF = Integer.parseInt(rowEndField);
+        String colEndField = endCo[1];
+        int colEF = Integer.parseInt(colEndField);
+
+        Field startField = board.getSpecificField(rowSF, colSF);
+        Field endField = board.getSpecificField(rowEF, colEF);
+
+        if(startField.isInStar() ){
+            if(endField.isInStar()) {
+                notifyObservers("Player move: " + move);
+            } else {
+                player.sendMessage("End Field " + end + "is not inside the star-shaped board");
+            }
+        } else {
+            player.sendMessage("Start Filed " + start + "is not inside the star-shaped board");
+        }
     }
 }

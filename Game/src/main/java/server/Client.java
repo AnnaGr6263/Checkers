@@ -19,7 +19,7 @@ public class Client {
             // Inicjalizacja strumienia wejściowego z serwera
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            System.out.println("Enter \"join\" to join the game, \"choose board big\" to select a board, and \"game start\" to start the game:");
+            System.out.println("Enter \"join\" to join the game, \"choose board BigBoard\" to select a board, and \"game start\" to start the game:");
 
             // Wątek odbierający wiadomości z serwera
             Thread receiverThread = new Thread(() -> {

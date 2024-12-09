@@ -25,6 +25,7 @@ public class ChooseBoard {
             case 1:
                 System.out.println("You selected BigBoard (16x24).");
                 board = new BigBoard(); // Tworzenie planszy BigBoard
+                board.boardGenerator();
                 break;
             default:
                 System.out.println("Invalid choice. Please select again.");
