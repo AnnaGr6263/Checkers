@@ -19,17 +19,17 @@ public class Client {
             // Inicjalizacja strumienia wejściowego z serwera
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+            System.out.println("Enter \"join\" to join the game, \"choose board big\" to select a board, and \"game start\" to start the game:");
+
             // Wątek odbierający wiadomości z serwera
             Thread receiverThread = new Thread(() -> {
                 try {
                     String serverMessage;
                     while ((serverMessage = in.readLine()) != null) {
-                        System.out.println("From server: " + serverMessage);
-                        // Sprawdzenie czy połączenie zostało odrzucone
+                        System.out.println(serverMessage);
                         if (serverMessage.contains("Connection rejected")) {
-                            System.exit(0); // Zakończenie aplikacji
+                            System.exit(0); // Zakończenie aplikacji, jeśli odrzucono połączenie
                         }
-                        System.out.println("Enter text: "); // Komunikat dla użytkownika
                     }
                 } catch (IOException ex) {
                     System.out.println("Connection closed by server.");
@@ -49,7 +49,6 @@ public class Client {
             String text;
 
             do {
-                System.out.println("Enter text: ");
                 text = bufferRead.readLine(); // Pobranie tekstu z konsoli
                 out.println(text); // Wysłanie tekstu do serwera
             } while (!text.equals("bye")); // Zakończenie, gdy użytkownik wpisze "bye"
