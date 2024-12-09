@@ -1,9 +1,0 @@
-server/Mediator.class
-board/BigBoard.class
-server/GameManager.class
-board/Field.class
-server/Server.class
-board/BoardSetup.class
-server/Client.class
-server/ChooseBoard.class
-server/Observer.class
