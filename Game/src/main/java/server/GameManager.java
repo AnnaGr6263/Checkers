@@ -97,55 +97,9 @@ public class GameManager {
             return;
         }
 
-        String[] commandWithoutWordMove = command.split(" ");
-        String move = commandWithoutWordMove[1];
-
-        String[] moveParts = move.split("->");
-
-        if (moveParts.length > 2) {
-            player.sendMessage("Invalid move. Use pattern: move [0,16]x[0,24]->[0,16]x[0,24]");
-        }
-
-        String start = moveParts[0];
-        String[] startCo = start.split("x");      // Współrzędne pola początkowego
-
-        if (startCo.length > 2) {
-            player.sendMessage("Invalid move. Use pattern: move [0,16]x[0,24]->[0,16]x[0,24]");
-        }
-
-        String rowStartField = startCo[0];
-        int rowSF = Integer.parseInt(rowStartField);
-        String colStartField = startCo[1];
-        int colSF = Integer.parseInt(colStartField);
-
-        String end = moveParts[1];
-        String[] endCo = end.split("x");      // Współrzędne pola końcowego
-
-        if (endCo.length > 2) {
-            player.sendMessage("Invalid move. Use pattern: move [0,16]x[0,24]->[0,16]x[0,24]");
-        }
-
-        String rowEndField = endCo[0];
-        int rowEF = Integer.parseInt(rowEndField);
-        String colEndField = endCo[1];
-        int colEF = Integer.parseInt(colEndField);
-
-
-        try {
-            Field startField = ChooseBoard.getInstance().getBoard().getSpecificField(rowSF, colSF);
-            Field endField = ChooseBoard.getInstance().getBoard().getSpecificField(rowEF, colEF);
-
-            if (startField.isInStar()) {
-                if (endField.isInStar()) {
-                    notifyObservers("Player move: " + move);
-                } else {
-                    player.sendMessage("End Field " + end + " is not inside the star-shaped board");
-                }
-            } else {
-                player.sendMessage("Start Filed " + start + " is not inside the star-shaped board");
-            }
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(e.getMessage());
+        MovesManager movesManager = new MovesManager(player, command);
+        if(movesManager.isMoveIntoStar()) {
+            notifyObservers("Player's " + command);
         }
     }
 }
