@@ -16,7 +16,7 @@ public class Field {
         return inStar;
     }
     public void setInStar(){
-        inStar = (!inStar);
+        inStar = true;
     }
 
     public int getCol() {

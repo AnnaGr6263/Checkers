@@ -25,11 +25,11 @@ public class BigBoard extends BoardSetup{
         }
         // Generowanie pól gwiazdy
         centerGenerator();
-        boardGenerator();
+        cornersGenerator();
     }
 
 
-    public void centerGenerator() {
+    private void centerGenerator() {
         // Dolna część środka
         int k=0;
         for(int r = 8; r <= 12; r++) {
@@ -52,7 +52,7 @@ public class BigBoard extends BoardSetup{
         }
     }
 
-    void cornersGenerator() {
+    private void cornersGenerator() {
 
         // Górny róg
         int i = 0;
@@ -120,10 +120,11 @@ public class BigBoard extends BoardSetup{
     // Zwraca pole o konkretnych współrzędnych
     @Override
     public Field getSpecificField(int row, int column) {
-        if(row < height && row > 0 && column < width && column > 0) {
+        if(row >= 0 && row < height && column >= 0 && column < width) {
             int index = row * width + column;
             return whole_board.get(index);
         }
-        return null;    //in other case it returns null so there is no such a field
+        //return null;    // Zwraca null gdy współrzędne są poza zakresem
+        throw new IllegalArgumentException("Coordinates out of bounds: row = " + row + ", column = " + column);
     }
 }

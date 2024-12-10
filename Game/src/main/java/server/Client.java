@@ -20,6 +20,7 @@ public class Client {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             System.out.println("Enter \"join\" to join the game, \"choose board BigBoard\" to select a board, and \"game start\" to start the game:");
+            System.out.println("Then send moves between players. Pattern: move [0,16]x[0,24]->[0,16]x[0,24]");
 
             // Wątek odbierający wiadomości z serwera
             Thread receiverThread = new Thread(() -> {

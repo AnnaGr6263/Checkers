@@ -1,6 +1,3 @@
-
-// Poprawione pod GameManager, tak jak sie umawiałyśmy
-
 package server;
 
 import board.BigBoard;
@@ -8,8 +5,9 @@ import board.BoardSetup;
 
 // Zastosowanie wzorca Singleton (możemy utworzyć tylko jedną instancję tej klasy dzięki czemu plansza jest ustawiana tylko raz)
 public class ChooseBoard {
-    private static ChooseBoard instance;
-    private BoardSetup board;
+
+    private static ChooseBoard instance = null;
+    private BoardSetup board = null;
 
     private ChooseBoard() {}        // Prywatny konstruktor
 
