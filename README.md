@@ -35,3 +35,10 @@ mvn exec:java -Dexec.mainClass="server.Server"
 ```bash
 mvn exec:java -Dexec.mainClass="server.Client"
 ```
+---
+### Useful commands after connnecting to the server:
+- `join`allows the client to join the game.
+- `choose board (type e.g. big)` allows the client to select a board before starting the game (the game will not begin without this step).
+- `game start` starts the game.
+- `move [0,16]x[0,24]->[0,16]x[0,24]` allows the player to make a move and sends it to the other players.
+- `bye` disconnects the client from the server.	
