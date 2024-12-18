@@ -12,16 +12,19 @@ public class GameManager {
     private final List<Mediator> players = new ArrayList<>(); // Lista graczy
     private boolean gameStarted = false;
 
+    // Dodanie obserwatora
     public void addObserver(Observer observer) {
         observers.add(observer);
     }
 
+    //informowanie obserwatorów
     private void notifyObservers(String message) {
-        for (Observer observer : new ArrayList<>(observers)) {
+        for (Observer observer : new ArrayList<>(observers)) {//new ArrayList<>(observers) - aby uniknąć ConcurrentModificationException
             observer.update(message);
         }
     }
 
+    // Dodanie gracza
     public synchronized boolean addPlayer(Mediator player) {
         if (gameStarted) {
             player.sendMessage("Game has already started. You cannot join.");
@@ -31,15 +34,16 @@ public class GameManager {
             player.sendMessage("Cannot join. Maximum 6 players allowed.");
             return false;
         }
-        players.add(player);
-        addObserver(player);
+        players.add(player); // Dodanie gracza do listy
+        addObserver(player); // Dodanie gracza jako obserwatora
         notifyObservers("Player joined. Total players: " + players.size());
         return true;
     }
 
+    // Obsługa komend
     public synchronized void handleCommand(Mediator player, String command) {
 
-        String[] elementsOfCommand = command.split(" ");
+        String[] elementsOfCommand = command.split(" "); // Podział komendy na elementy
 
         if(command.equals("join")) {
             addPlayer(player);
@@ -55,12 +59,13 @@ public class GameManager {
 
     }
 
+    // Rozpoczęcie gry
     private void startGame(Mediator sender) {
         if (gameStarted) {
             sender.sendMessage("Game has already started.");
             return;
         }
-        if (!ChooseBoard.getInstance().isBoardChosen()) {
+        if (!ChooseBoard.getInstance().isBoardChosen()) { // Sprawdzenie, czy plansza została wybrana
             sender.sendMessage("Please choose a board before starting the game using the command 'choose board big'.");
             return;
         }
@@ -68,17 +73,17 @@ public class GameManager {
             sender.sendMessage("Game requires 2, 3, 4, or 6 players.");
             return;
         }
-        gameStarted = true;
+        gameStarted = true; // Ustawienie flagi rozpoczęcia gry
         notifyObservers("Game started with " + players.size() + " players on the chosen board!");
     }
 
-
+    // Wybór planszy
     private void chooseBoard(Mediator player, String command) {
         if (gameStarted) {
             player.sendMessage("Cannot change the board. The game has already started.");
             return;
         }
-        if (ChooseBoard.getInstance().isBoardChosen()) {
+        if (ChooseBoard.getInstance().isBoardChosen()) { // Sprawdzenie, czy plansza została już wybrana
             player.sendMessage("Board has already been chosen.");
             return;
         }
@@ -90,15 +95,15 @@ public class GameManager {
         }
     }
 
-
+    // Obsługa ruchu
     private void processMove(Mediator player, String command) {
         if (!gameStarted) {
             player.sendMessage("Game has not started yet.");
             return;
         }
-
+        //utworzenie obiektu MovesManager
         MovesManager movesManager = new MovesManager(player, command);
-        if(movesManager.isMoveIntoStar()) {
+        if(movesManager.isMoveIntoStar()) { // Sprawdzenie, czy ruch jest poprawny
             notifyObservers("Player's " + command);
         }
     }

@@ -13,10 +13,10 @@ public class Client {
         try {
             Socket socket = new Socket("localhost", 4444); // Połączenie z serwerem na porcie 4444
 
-            // Inicjalizacja strumienia wyjściowego do serwera
+            // Inicjalizacja strumienia wyjściowego do serwera (wysylanie)
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            // Inicjalizacja strumienia wejściowego z serwera
+            // Inicjalizacja strumienia wejściowego z serwera (odbieranie)
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             System.out.println("Enter \"join\" to join the game, \"choose board BigBoard\" to select a board, and \"game start\" to start the game:");
@@ -26,8 +26,8 @@ public class Client {
             Thread receiverThread = new Thread(() -> {
                 try {
                     String serverMessage;
-                    while ((serverMessage = in.readLine()) != null) {
-                        System.out.println(serverMessage);
+                    while ((serverMessage = in.readLine()) != null) { // Oczekiwanie na wiadomość od serwera
+                        System.out.println(serverMessage); // Wyświetlenie wiadomości od serwera
                         if (serverMessage.contains("Connection rejected")) {
                             System.exit(0); // Zakończenie aplikacji, jeśli odrzucono połączenie
                         }

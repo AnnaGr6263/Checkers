@@ -24,7 +24,9 @@ public class Server {
                     continue;
                 }
 
+                // Połączenie z nowym klientem
                 connectedClients.incrementAndGet();
+                // Utworzenie nowego mediatora dla klienta
                 Mediator mediator = new Mediator(socket, gameManager);
                 System.out.println("New client connected. Total clients: " + connectedClients.get());
             }
@@ -34,7 +36,7 @@ public class Server {
     }
 
     private static void rejectClient(Socket socket) {
-        try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+        try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) { // Inicjalizacja strumienia wyjściowego
             out.println("Connection rejected: Server is full.");
         } catch (IOException ex) {
             System.out.println("Error rejecting client: " + ex.getMessage());
@@ -47,6 +49,7 @@ public class Server {
         }
     }
 
+    // Metoda wywoływana po rozłączeniu klienta
     public static void clientDisconnected() {
         connectedClients.decrementAndGet(); // Zmniejszenie licznika klientów
         System.out.println("A client disconnected. Connected clients: " + connectedClients.get());

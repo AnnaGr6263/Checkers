@@ -18,6 +18,7 @@ public class ChooseBoard {
         return instance;    // Zwróć jedyną instancję
     }
 
+    // Wybór planszy
     public BoardSetup choose(int choice) {
         switch (choice) {
             case 1:

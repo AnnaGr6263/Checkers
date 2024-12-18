@@ -14,7 +14,7 @@ public class MovesManager {
 
     // Metoda odpowiedzialna za sprawdzanie czy ruch jest całkowicie poprawny w ramach wybranej planszy
     public boolean isMoveIntoStar() {
-        String[] commandWithoutWordMove = command.split(" ");
+        String[] commandWithoutWordMove = command.split(" "); // Podział komendy na części
         String move = commandWithoutWordMove[1];
 
         String[] moveParts = move.split("->");
@@ -24,8 +24,8 @@ public class MovesManager {
             return false;
         }
 
-        String start = moveParts[0];
-        String end = moveParts[1];
+        String start = moveParts[0]; // Początek ruchu
+        String end = moveParts[1]; // Koniec ruchu
         String[] startCo = start.split("x");      // Współrzędne pola początkowego
         String[] endCo = end.split("x");      // Współrzędne pola końcowego
 
@@ -34,10 +34,10 @@ public class MovesManager {
             return false;
         }
 
-        String rowStartField = startCo[0];
-        String colStartField = startCo[1];
-        String rowEndField = endCo[0];
-        String colEndField = endCo[1];
+        String rowStartField = startCo[0]; // Wiersz pola początkowego
+        String colStartField = startCo[1]; // Kolumna pola początkowego
+        String rowEndField = endCo[0];// Wiersz pola końcowego
+        String colEndField = endCo[1]; // Kolumna pola końcowego
 
         int rowSF;
         try {

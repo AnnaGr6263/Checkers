@@ -20,12 +20,13 @@ public class Mediator extends Thread implements Observer {
         } catch (IOException ex) {
             System.out.println("Error initializing PrintWriter: " + ex.getMessage());
         }
-        this.start();
+        this.start(); // Uruchomienie wątku
     }
 
     @Override
+    // Odbieranie wiadomości od klienta - watek
     public void run() {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) { // Inicjalizacja strumienia wejściowego
             String message;
             while ((message = in.readLine()) != null) {
                 if (message.equalsIgnoreCase("bye")) {
