@@ -103,7 +103,7 @@ public class GameManager {
         }
         //utworzenie obiektu MovesManager
         MovesManager movesManager = new MovesManager(player, command);
-        if(movesManager.isMoveIntoStar()) { // Sprawdzenie, czy ruch jest poprawny
+        if(movesManager.isValidMove()) { // Sprawdzenie, czy ruch jest poprawny
             notifyObservers("Player's " + command);
         }
     }

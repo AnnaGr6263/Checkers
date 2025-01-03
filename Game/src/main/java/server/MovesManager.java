@@ -15,6 +15,11 @@ public class MovesManager {
     // Metoda odpowiedzialna za sprawdzanie czy ruch jest całkowicie poprawny w ramach wybranej planszy
     public boolean isMoveIntoStar() {
         String[] commandWithoutWordMove = command.split(" "); // Podział komendy na części
+        if(commandWithoutWordMove.length == 1) {
+            player.sendMessage("Invalid command. After move command give coordinates");
+            return false;
+        }
+
         String move = commandWithoutWordMove[1];
 
         String[] moveParts = move.split("->");
@@ -92,5 +97,10 @@ public class MovesManager {
             player.sendMessage(e.getMessage());
             return false;
         }
+    }
+
+    public boolean isValidMove() {
+        if(!isMoveIntoStar()) return false;             // Jeśli ruch jest całkowicie poza planszą w jakikolwiek sposób mamy błąd
+        else return true;
     }
 }
