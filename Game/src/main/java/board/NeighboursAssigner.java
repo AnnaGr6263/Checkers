@@ -9,9 +9,12 @@ public class NeighboursAssigner {
     private final BoardSetup board;
     private final List<Field> fieldsInsideAStar;
 
-    public NeighboursAssigner() {
-        this.board = ChooseBoard.getInstance().getBoard();          // Aktualnie używana plansza
-        this.fieldsInsideAStar = board.getFieldsInsideAStar();      // Lista pól do grania dla aktualnie używanej planszy
+    public NeighboursAssigner(BoardSetup board) {
+        if (board == null) {
+            throw new IllegalArgumentException("Board cannot be null");
+        }
+        this.board = board; // Przekazana plansza
+        this.fieldsInsideAStar = board.getFieldsInsideAStar(); // Lista pól gwiazdy
     }
 
     public void assignNeighbours() {

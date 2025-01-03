@@ -128,7 +128,7 @@ public class BigBoard extends BoardSetup{
     }
 
     public void assignNeighbours() {
-        NeighboursAssigner neighboursAssigner = new NeighboursAssigner();
+        NeighboursAssigner neighboursAssigner = new NeighboursAssigner(this);
         neighboursAssigner.assignNeighbours();
     }
 
