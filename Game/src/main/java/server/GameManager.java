@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
-    //private BoardSetup board;       // Plansza gry
+
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
     private final List<Mediator> players = new ArrayList<>(); // Lista graczy
     private boolean gameStarted = false;
@@ -66,7 +66,7 @@ public class GameManager {
             return;
         }
         if (!ChooseBoard.getInstance().isBoardChosen()) { // Sprawdzenie, czy plansza została wybrana
-            sender.sendMessage("Please choose a board before starting the game using the command 'choose board big'.");
+            sender.sendMessage("Please choose a board before starting the game using the command 'choose board BigBoard'.");
             return;
         }
         if (players.size() != 2 && players.size() != 3 && players.size() != 4 && players.size() != 6) {

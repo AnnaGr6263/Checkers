@@ -1,5 +1,7 @@
 package board;
 
+import board.enums.HomeColor;
+
 import java.util.*;
 
 public class BigBoard extends BoardSetup{
@@ -9,6 +11,7 @@ public class BigBoard extends BoardSetup{
     private List<Field> whole_board = new ArrayList<>();
     private List<Field> fieldsInsideAStar = new ArrayList<>();     // Pola, które zawiera nasze pole gry czyli gwiazda
 
+    @Override
     public List<Field> getFieldsInsideAStar() {
         return fieldsInsideAStar;
     }
@@ -19,7 +22,7 @@ public class BigBoard extends BoardSetup{
         // Generuje całą tablicę na razie bez decydowania co należy do gwiazdy a co nie
         for(int r = 0; r < height; r++) {
             for(int c = 0; c < width; c++) {
-                Field currentField = new Field(r, c);
+                Field currentField = new Field(r, c);       // Tworzy pola, na razie wszystkie
                 whole_board.add(currentField);
             }
         }
@@ -54,63 +57,69 @@ public class BigBoard extends BoardSetup{
 
     private void cornersGenerator() {
 
-        // Górny róg
+        // Górny róg - CZERWONY
         int i = 0;
         for(int r = 3; r >= 0; r-- ) {
             for (int c = 9 + i; c <= 15 - i; c += 2) {
                 Field curField = getSpecificField(r, c);
-                curField.setInStar();
+                curField.setInStar();                   // Dodanie pola do gwiazdy
+                curField.setHome(HomeColor.RED);        // Dodanie pola jako czerwony domek
                 fieldsInsideAStar.add(curField);
             }
             i++;
         }
-        // Lewy górny róg
+        // Lewy górny róg - BIAŁY
         int k=0;
         for(int r = 4; r <= 7; r++) {
             for (int c = k; c <= 6 - k; c += 2) {
                 Field currentField = getSpecificField(r, c);
                 currentField.setInStar();
+                currentField.setHome(HomeColor.WHITE);
                 fieldsInsideAStar.add(currentField);
             }
             k++;
         }
 
-        // Lewy dolny róg
+        // Lewy dolny róg - ŻÓŁTY
         int j = 0;
         for(int r = 12; r >= 9; r-- ) {
             for (int c = j; c <= 6 - j; c += 2) {
                 Field curField = getSpecificField(r, c);
                 curField.setInStar();
+                curField.setHome(HomeColor.YELLOW);
                 fieldsInsideAStar.add(curField);
             }
             j++;
         }
-        // Prawy górny róg
+        // Prawy górny róg - ZIELONY
         int l=0;
         for(int r = 4; r <= 7; r++) {
             for (int c = 18 + l; c <= 24 - l; c += 2) {
                 Field currentField = getSpecificField(r, c);
                 currentField.setInStar();
+                currentField.setHome(HomeColor.GREEN);
                 fieldsInsideAStar.add(currentField);
             }
             l++;
         }
-        // Prawy dolny róg
+        // Prawy dolny róg - CZARNY
         int m = 0;
         for(int r = 12; r >= 9; r-- ) {
             for (int c = 18 + m; c <= 24 - m; c += 2) {
                 Field curField = getSpecificField(r, c);
                 curField.setInStar();
+                curField.setHome(HomeColor.BLACK);
                 fieldsInsideAStar.add(curField);
             }
             m++;
         }
-        // Dolny róg
+        // Dolny róg - BLUE
         int n=0;
         for(int r = 4; r <= 7; r++) {
             for (int c = 18 + n; c <= 24 - n; c += 2) {
                 Field currentField = getSpecificField(r, c);
                 currentField.setInStar();
+                currentField.setHome(HomeColor.BLUE);
                 fieldsInsideAStar.add(currentField);
             }
             n++;
