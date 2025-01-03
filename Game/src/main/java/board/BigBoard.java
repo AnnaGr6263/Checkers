@@ -126,6 +126,11 @@ public class BigBoard extends BoardSetup{
         }
     }
 
+    public void assignNeighbours() {
+        NeighboursAssigner neighboursAssigner = new NeighboursAssigner();
+        neighboursAssigner.assignNeighbours();
+    }
+
     // Zwraca pole o konkretnych współrzędnych
     @Override
     public Field getSpecificField(int row, int column) {
@@ -133,7 +138,6 @@ public class BigBoard extends BoardSetup{
             int index = row * width + column;
             return whole_board.get(index);
         }
-        //return null;    // Zwraca null gdy współrzędne są poza zakresem
         throw new IllegalArgumentException("Coordinates out of bounds: row = " + row + ", column = " + column);
     }
 }

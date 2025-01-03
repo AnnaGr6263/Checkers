@@ -2,6 +2,9 @@ package board;
 
 import board.enums.HomeColor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Field {
 
     private boolean inStar = false;         // Czy pole zawiera się w gwieżdzie? (Pole gry)
@@ -9,6 +12,7 @@ public class Field {
     private int row;                        // Wiersz
     private HomeColor home;                 // Czy pole jest domkiem, jak tak to jakim
     private Piece piece;                    // Pion, który znajduje się na danym polu
+    private List<Field> neighbours = new ArrayList<>();
 
     public Field(int row, int col) {
         this.col = col;
@@ -52,5 +56,15 @@ public class Field {
 
     public boolean hasPiece() {
         return this.piece != null;
+    }
+
+    public List<Field> getNeighbours() {
+        return neighbours;
+    }
+
+    public void addNeighbour(Field neighbour) {
+        if(!neighbours.contains(neighbour)) {
+            neighbours.add(neighbour);
+        }
     }
 }
