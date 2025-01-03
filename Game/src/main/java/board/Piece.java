@@ -9,7 +9,7 @@ public class Piece {
         this.color = color;
     }
 
-    public PieceColor getColor() {
+    public PieceColor getColor() {          // Od koloru piona zależy czyj on jest
         return color;
     }
 }

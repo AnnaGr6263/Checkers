@@ -46,6 +46,9 @@ public class Field {
     public void setPiece(Piece piece) {
         this.piece = piece;
     }
+    public void removePiece() {
+        this.piece = null;
+    }
 
     public boolean hasPiece() {
         return this.piece != null;
