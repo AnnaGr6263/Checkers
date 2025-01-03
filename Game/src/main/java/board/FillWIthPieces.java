@@ -4,7 +4,6 @@ import board.enums.PieceColor;
 import server.ChooseBoard;
 import server.Mediator;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class FillWIthPieces {
