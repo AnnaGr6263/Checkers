@@ -6,5 +6,5 @@ public enum PieceColor {
     BLACK_PIECE,
     BLUE_PIECE,
     YELLOW_PIECE,
-    WHITE_PIECE
+    PURPLE_PIECE
 }

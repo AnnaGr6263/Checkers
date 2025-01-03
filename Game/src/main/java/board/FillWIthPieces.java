@@ -57,8 +57,8 @@ public class FillWIthPieces {
                     if(field.getHome() == HomeColor.RED) {
                         Piece redPiece = new Piece(PieceColor.RED_PIECE);
                         field.setPiece(redPiece);
-                    } else if (field.getHome() == HomeColor.WHITE) {
-                        Piece whitePiece = new Piece(PieceColor.WHITE_PIECE);
+                    } else if (field.getHome() == HomeColor.PURPLE) {
+                        Piece whitePiece = new Piece(PieceColor.PURPLE_PIECE);
                         field.setPiece(whitePiece);
                     } else if (field.getHome() == HomeColor.BLACK) {
                         Piece blackPiece = new Piece(PieceColor.BLACK_PIECE);
@@ -80,7 +80,7 @@ public class FillWIthPieces {
                     else if (field.getHome() == HomeColor.BLACK) color = PieceColor.BLACK_PIECE;
                     else if (field.getHome() == HomeColor.BLUE) color = PieceColor.BLUE_PIECE;
                     else if (field.getHome() == HomeColor.YELLOW) color = PieceColor.YELLOW_PIECE;
-                    else if (field.getHome() == HomeColor.WHITE) color = PieceColor.WHITE_PIECE;
+                    else if (field.getHome() == HomeColor.PURPLE) color = PieceColor.PURPLE_PIECE;
 
                     if (color != null) {
                         Piece piece = new Piece(color);

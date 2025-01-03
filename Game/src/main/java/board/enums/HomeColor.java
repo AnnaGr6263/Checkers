@@ -7,5 +7,5 @@ public enum HomeColor {
     BLACK,  // Prawy dolny róg
     BLUE,   // Dolny róg
     YELLOW, // Lewy dolny róg
-    WHITE   // Lewy górny róg
+    PURPLE   // Lewy górny róg
 }

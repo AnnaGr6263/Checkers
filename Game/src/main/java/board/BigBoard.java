@@ -75,7 +75,7 @@ public class BigBoard extends BoardSetup{
             for (int c = k; c <= 6 - k; c += 2) {
                 Field currentField = getSpecificField(r, c);
                 currentField.setInStar();
-                currentField.setHome(HomeColor.WHITE);
+                currentField.setHome(HomeColor.PURPLE);
                 fieldsInsideAStar.add(currentField);
             }
             k++;
