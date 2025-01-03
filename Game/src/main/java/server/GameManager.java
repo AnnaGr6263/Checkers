@@ -109,6 +109,8 @@ public class GameManager {
         MovesManager movesManager = new MovesManager(player, command);
         if(movesManager.isValidMove()) { // Sprawdzenie, czy ruch jest poprawny
             notifyObservers("Player's " + command);
+            //TO DO Wykonanie ruchu
+
         }
     }
 }
