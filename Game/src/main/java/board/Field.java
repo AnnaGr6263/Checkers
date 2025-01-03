@@ -43,6 +43,7 @@ public class Field {
     public void setHome(HomeColor home) {
         this.home = home;
     }
+
     public Piece getPiece() {
         return piece;
     }

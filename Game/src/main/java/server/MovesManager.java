@@ -7,6 +7,9 @@ public class MovesManager {
     private Mediator player;
     private String command;
 
+    private Field startField = null;
+    private Field endField = null;
+
     public MovesManager(Mediator player, String command) {
         this.player = player;
         this.command = command;
@@ -79,8 +82,8 @@ public class MovesManager {
 
 
         try {
-            Field startField = ChooseBoard.getInstance().getBoard().getSpecificField(rowSF, colSF);
-            Field endField = ChooseBoard.getInstance().getBoard().getSpecificField(rowEF, colEF);
+            startField = ChooseBoard.getInstance().getBoard().getSpecificField(rowSF, colSF);
+            endField = ChooseBoard.getInstance().getBoard().getSpecificField(rowEF, colEF);
 
             if (startField.isInStar()) {
                 if (endField.isInStar()) {
@@ -100,7 +103,14 @@ public class MovesManager {
     }
 
     public boolean isValidMove() {
-        if(!isMoveIntoStar()) return false;             // Jeśli ruch jest całkowicie poza planszą w jakikolwiek sposób mamy błąd
-        else return true;
+        if(!isMoveIntoStar()) return false;          // Jeśli ruch jest całkowicie poza planszą lub zła komenda
+
+        // Końcowe pole nie jest sąsiadem (czyli jest gdzieś dalej) lub jest zajęte przez pion
+        if(!startField.getNeighbours().contains(endField) || endField.hasPiece()) {
+            player.sendMessage("Move is not available");
+            return false;
+        }
+        // W innym wypadku ruch jest możliwy
+        return true;
     }
 }

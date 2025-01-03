@@ -12,7 +12,6 @@ public class FillWIthPieces {
     private List<Mediator> players;         // Gracze, czyli klienci, dla których rozpoczęła się gra
     private List<Field> playingFields = ChooseBoard.getInstance().getBoard().getFieldsInsideAStar();        // Pola używane do gry
 
-    //private HashMap<Piece, >
 
     public FillWIthPieces(List<Mediator> players) {
         this.players = players;

@@ -2,6 +2,7 @@ package server;
 
 import board.BoardSetup;
 import board.Field;
+import board.FillWIthPieces;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,9 @@ public class GameManager {
         }
         gameStarted = true; // Ustawienie flagi rozpoczęcia gry
         notifyObservers("Game started with " + players.size() + " players on the chosen board!");
+        // Jak już mamy określoną liczbę graczy to wypałniamy odpowiednio pionami konkretne domki
+        FillWIthPieces fillWIthPieces = new FillWIthPieces(players);
+        fillWIthPieces.fill();
     }
 
     // Wybór planszy

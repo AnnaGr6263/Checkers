@@ -29,6 +29,7 @@ public class BigBoard extends BoardSetup{
         // Generowanie pól gwiazdy
         centerGenerator();
         cornersGenerator();
+        assignNeighbours();
     }
 
 
