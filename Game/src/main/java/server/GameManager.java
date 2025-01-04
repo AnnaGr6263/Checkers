@@ -1,8 +1,10 @@
 package server;
 import board.BoardSetup;
+import board.Field;
 import board.FillWIthPieces;
 import javafx.application.Application;
 import javafx.application.Platform;
+import server.RulesManager;
 import GUI.GUI;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,7 @@ public class GameManager {
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
     private final List<Mediator> players = new ArrayList<>(); // Lista graczy
     private boolean gameStarted = false;
+    private RulesManager rulesManager; // Zarządca zasad gry
 
     // Dodanie obserwatora
     public void addObserver(Observer observer) {
@@ -80,6 +83,10 @@ public class GameManager {
         FillWIthPieces fillWIthPieces = new FillWIthPieces(players);
         fillWIthPieces.fill();
 
+        // Utworzenie RulesManager i rozpoczęcie gry
+        rulesManager = new RulesManager(players);
+        rulesManager.startGame();
+
         // Przekazanie instancji planszy do GUI
         BoardSetup currentBoard = ChooseBoard.getInstance().getBoard();
         System.out.println("Starting GUI...");
@@ -87,6 +94,9 @@ public class GameManager {
             GUI.setBoard(currentBoard); // Przekazanie planszy
             Application.launch(GUI.class); // Uruchomienie GUI
         }).start();
+
+        // Powiadom pierwszego gracza o jego ruchu
+        rulesManager.getCurrentPlayer().sendMessage("It's your turn!");
     }
 
 
@@ -117,6 +127,17 @@ public class GameManager {
         // Utworzenie obiektu MovesManager
         MovesManager movesManager = new MovesManager(player, command);
 
+        Field startField = movesManager.getStartField(); // Pobierz pole startowe
+        if (startField == null) {
+            player.sendMessage("Invalid move: The starting field does not exist.");
+            return;
+        }
+
+        if (!rulesManager.canPlayerMove(player, movesManager.getStartField())) {
+            return; // Gracz nie ma prawa wykonać ruchu
+        }
+
         movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
+        rulesManager.nextPlayer();          // Przejście do kolejnego gracza
     }
 }

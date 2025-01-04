@@ -13,6 +13,7 @@ board/Piece.class
 GUI/GUI$1.class
 board/BoardSetup.class
 GUI/GUIMoves.class
+server/RulesManager.class
 board/NeighboursAssigner.class
 server/Observer.class
 GUI/GUI.class

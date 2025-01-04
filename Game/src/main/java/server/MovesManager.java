@@ -20,6 +20,12 @@ public class MovesManager {
         // Uzyskaj instancję GUI i zainicjalizuj GUIMoves
         GUI gui = GUI.getInstance();
         this.guiMoves = new GUIMoves(gui);
+
+        isMoveIntoStar();
+    }
+
+    public Field getStartField() {
+        return startField;
     }
 
     // Metoda odpowiedzialna za sprawdzanie czy ruch jest całkowicie poprawny w ramach wybranej planszy
