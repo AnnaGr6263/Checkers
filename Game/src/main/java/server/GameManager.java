@@ -1,9 +1,5 @@
 package server;
-
-import board.BoardSetup;
-import board.Field;
 import board.FillWIthPieces;
-
 import java.util.ArrayList;
 import java.util.List;
 
