@@ -116,8 +116,8 @@ public class BigBoard extends BoardSetup{
         }
         // Dolny róg - BLUE
         int n=0;
-        for(int r = 4; r <= 7; r++) {
-            for (int c = 18 + n; c <= 24 - n; c += 2) {
+        for(int r = 13; r <= 16; r++) {
+            for (int c = 9 + n; c <= 15 - n; c += 2) {
                 Field currentField = getSpecificField(r, c);
                 currentField.setInStar();
                 currentField.setHome(HomeColor.BLUE);
