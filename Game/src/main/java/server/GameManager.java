@@ -3,8 +3,6 @@ import board.BoardSetup;
 import board.Field;
 import board.FillWIthPieces;
 import javafx.application.Application;
-import javafx.application.Platform;
-import server.RulesManager;
 import GUI.GUI;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +20,7 @@ public class GameManager {
     }
 
     //informowanie obserwatorów
-    private void notifyObservers(String message) {
+    public void notifyObservers(String message) {
         for (Observer observer : new ArrayList<>(observers)) {//new ArrayList<>(observers) - aby uniknąć ConcurrentModificationException
             observer.update(message);
         }
@@ -125,7 +123,7 @@ public class GameManager {
             return;
         }
         // Utworzenie obiektu MovesManager
-        MovesManager movesManager = new MovesManager(player, command);
+        MovesManager movesManager = new MovesManager(player, command, this);
 
         Field startField = movesManager.getStartField(); // Pobierz pole startowe
         if (startField == null) {

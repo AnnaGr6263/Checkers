@@ -1,8 +1,6 @@
 package server;
-
 import board.Field;
 import board.enums.HomeColor;
-
 import java.util.*;
 
 public class RulesManager {

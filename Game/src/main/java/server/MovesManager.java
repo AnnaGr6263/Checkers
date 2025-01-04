@@ -12,10 +12,12 @@ public class MovesManager {
     private Field startField = null;
     private Field endField = null;
     private GUIMoves guiMoves;
+    private GameManager gameManager;
 
-    public MovesManager(Mediator player, String command) {
+    public MovesManager(Mediator player, String command, GameManager gameManager) {
         this.player = player;
         this.command = command;
+        this.gameManager = gameManager;
 
         // Uzyskaj instancję GUI i zainicjalizuj GUIMoves
         GUI gui = GUI.getInstance();
@@ -135,9 +137,12 @@ public class MovesManager {
             startField.removePiece();           // Usuń pionek z pola początkowego
             endField.setPiece(piece);           // Ustaw pionek na polu końcowym
 
-            // Wyślij potwierdzenie
-            player.sendMessage("Move performed: " + startField.getRow() + "x" + startField.getCol() +
-                    " -> " + endField.getRow() + "x" + endField.getCol());
+            // Wyślij powiadomienie do wszystkich graczy
+            String message = String.format("Move performed by %s: %dx%d -> %dx%d",
+                    piece.getColor(), // Kolor pionka wykonującego ruch
+                    startField.getRow(), startField.getCol(),
+                    endField.getRow(), endField.getCol());
+            gameManager.notifyObservers(message); // Wywołanie notifyObservers
 
             // Zaktualizuj GUI
             guiMoves.updateMove(startField, endField);
