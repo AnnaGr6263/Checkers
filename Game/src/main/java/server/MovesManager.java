@@ -1,6 +1,7 @@
 package server;
 
 import board.Field;
+import board.Piece;
 
 public class MovesManager {
 
@@ -16,7 +17,7 @@ public class MovesManager {
     }
 
     // Metoda odpowiedzialna za sprawdzanie czy ruch jest całkowicie poprawny w ramach wybranej planszy
-    public boolean isMoveIntoStar() {
+    private boolean isMoveIntoStar() {
         String[] commandWithoutWordMove = command.split(" "); // Podział komendy na części
         if(commandWithoutWordMove.length == 1) {
             player.sendMessage("Invalid command. After move command give coordinates");
@@ -102,7 +103,7 @@ public class MovesManager {
         }
     }
 
-    public boolean isValidMove() {
+    private boolean isValidMove() {
         if(!isMoveIntoStar()) return false;          // Jeśli ruch jest całkowicie poza planszą lub zła komenda
 
         // Końcowe pole nie jest sąsiadem (czyli jest gdzieś dalej) lub jest zajęte przez pion
@@ -112,5 +113,19 @@ public class MovesManager {
         }
         // W innym wypadku ruch jest możliwy
         return true;
+    }
+    public void performMove() {
+        if (!isValidMove()) {
+            player.sendMessage("Cannot perform move. Invalid move detected.");
+        } else {
+            // Przenieś pionek
+            Piece piece = startField.getPiece(); // Pobierz pionek z pola początkowego
+            startField.removePiece();           // Usuń pionek z pola początkowego
+            endField.setPiece(piece);           // Ustaw pionek na polu końcowym
+
+            // Wyślij potwierdzenie
+            player.sendMessage("Move performed: " + startField.getRow() + "x" + startField.getCol() +
+                    " -> " + endField.getRow() + "x" + endField.getCol());
+        }
     }
 }

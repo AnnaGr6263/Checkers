@@ -105,12 +105,9 @@ public class GameManager {
             player.sendMessage("Game has not started yet.");
             return;
         }
-        //utworzenie obiektu MovesManager
+        // Utworzenie obiektu MovesManager
         MovesManager movesManager = new MovesManager(player, command);
-        if(movesManager.isValidMove()) { // Sprawdzenie, czy ruch jest poprawny
-            notifyObservers("Player's " + command);
-            //TO DO Wykonanie ruchu
 
-        }
+        movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
     }
 }
