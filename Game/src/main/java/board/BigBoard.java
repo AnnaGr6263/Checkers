@@ -69,7 +69,7 @@ public class BigBoard extends BoardSetup{
             }
             i++;
         }
-        // Lewy górny róg - BIAŁY
+        // Lewy górny róg - FIOLETOWY
         int k=0;
         for(int r = 4; r <= 7; r++) {
             for (int c = k; c <= 6 - k; c += 2) {

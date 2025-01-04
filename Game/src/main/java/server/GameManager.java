@@ -1,5 +1,9 @@
 package server;
+import board.BoardSetup;
 import board.FillWIthPieces;
+import javafx.application.Application;
+import javafx.application.Platform;
+import GUI.GUI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +79,16 @@ public class GameManager {
         // Jak już mamy określoną liczbę graczy to wypałniamy odpowiednio pionami konkretne domki
         FillWIthPieces fillWIthPieces = new FillWIthPieces(players);
         fillWIthPieces.fill();
+
+        // Przekazanie instancji planszy do GUI
+        BoardSetup currentBoard = ChooseBoard.getInstance().getBoard();
+        System.out.println("Starting GUI...");
+        new Thread(() -> {
+            GUI.setBoard(currentBoard); // Przekazanie planszy
+            Application.launch(GUI.class); // Uruchomienie GUI
+        }).start();
     }
+
 
     // Wybór planszy
     private void chooseBoard(Mediator player, String command) {

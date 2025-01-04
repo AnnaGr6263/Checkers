@@ -25,7 +25,7 @@ public class FillWIthPieces {
                     // Wypełnianie domków - jak mamy dwóch graczy to gramy tylko niebieskimi i czerwonymi pionami
                     if(field.getHome() == HomeColor.RED ) {
                         Piece redPiece = new Piece(PieceColor.RED_PIECE);       // Utworzenie czerwonego pionka
-                        field.setPiece(redPiece);                               // Dodanie go w polu domka
+                        field.setPiece(redPiece);
                     } else if (field.getHome() == HomeColor.BLUE) {
                         Piece bluePiece = new Piece(PieceColor.BLUE_PIECE);
                         field.setPiece(bluePiece);
@@ -90,5 +90,4 @@ public class FillWIthPieces {
                 break;
         }
     }
-
 }
