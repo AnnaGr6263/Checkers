@@ -1,5 +1,6 @@
 package server;
-
+import GUI.GUI;
+import GUI.GUIMoves;
 import board.Field;
 import board.Piece;
 
@@ -10,10 +11,15 @@ public class MovesManager {
 
     private Field startField = null;
     private Field endField = null;
+    private GUIMoves guiMoves;
 
     public MovesManager(Mediator player, String command) {
         this.player = player;
         this.command = command;
+
+        // Uzyskaj instancję GUI i zainicjalizuj GUIMoves
+        GUI gui = GUI.getInstance();
+        this.guiMoves = new GUIMoves(gui);
     }
 
     // Metoda odpowiedzialna za sprawdzanie czy ruch jest całkowicie poprawny w ramach wybranej planszy
@@ -126,6 +132,9 @@ public class MovesManager {
             // Wyślij potwierdzenie
             player.sendMessage("Move performed: " + startField.getRow() + "x" + startField.getCol() +
                     " -> " + endField.getRow() + "x" + endField.getCol());
+
+            // Zaktualizuj GUI
+            guiMoves.updateMove(startField, endField);
         }
     }
 }

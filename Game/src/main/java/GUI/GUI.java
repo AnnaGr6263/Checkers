@@ -5,6 +5,7 @@ import board.Field;
 import board.Piece;
 import board.enums.HomeColor;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -59,10 +60,12 @@ public class GUI extends Application {
     // Odświeżanie GUI
     public void refresh() {
         System.out.println("Refreshing GUI..."); // Informacja debug
-        root.getChildren().clear(); // Wyczyść wszystkie elementy GUI
-        drawGrid(); // Narysuj siatkę
-        drawFields(); // Narysuj pola planszy
-        drawPieces(); // Narysuj pionki
+        Platform.runLater(() -> { // Wykonaj w wątku JavaFX
+            root.getChildren().clear(); // Wyczyść wszystkie elementy GUI
+            drawGrid(); // Narysuj siatkę
+            drawFields(); // Narysuj pola planszy
+            drawPieces(); // Narysuj pionki
+        });
     }
 
     // Rysowanie siatki planszy

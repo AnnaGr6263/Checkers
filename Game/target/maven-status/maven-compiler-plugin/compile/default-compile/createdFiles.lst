@@ -12,6 +12,7 @@ server/MovesManager.class
 board/Piece.class
 GUI/GUI$1.class
 board/BoardSetup.class
+GUI/GUIMoves.class
 board/NeighboursAssigner.class
 server/Observer.class
 GUI/GUI.class
