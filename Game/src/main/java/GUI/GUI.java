@@ -123,8 +123,12 @@ public class GUI extends Application {
             circle.setStroke(Color.BLACK); // Obrys koła
             circle.setStrokeWidth(1.5); // Grubość obrysu
 
-            if (field.getHome() != HomeColor.NONE) {
-                circle.setFill(getColorForHome(field.getHome())); // Kolor domku
+            if (field.getHome() != HomeColor.NONE && !field.hasPiece()) {
+                // Ustaw półprzezroczysty kolor dla pustego domku
+                circle.setFill(getTransparentColorForHome(field.getHome()));
+            } else if (field.getHome() != HomeColor.NONE) {
+                // Ustaw pełny kolor dla domku z pionkiem
+                circle.setFill(getColorForHome(field.getHome()));
             } else {
                 circle.setFill(Color.TRANSPARENT); // Zwykłe pola są przezroczyste
             }
@@ -156,6 +160,26 @@ public class GUI extends Application {
                 transparentCircle.setFill(Color.TRANSPARENT);
                 root.getChildren().add(transparentCircle);
             }
+        }
+    }
+
+    // Pobierz półprzezroczysty kolor dla domku na podstawie HomeColor
+    private Color getTransparentColorForHome(HomeColor home) {
+        switch (home) {
+            case RED:
+                return Color.rgb(255, 0, 0, 0.3); // Półprzezroczysty czerwony
+            case BLUE:
+                return Color.rgb(0, 0, 255, 0.3); // Półprzezroczysty niebieski
+            case GREEN:
+                return Color.rgb(0, 255, 0, 0.3); // Półprzezroczysty zielony
+            case YELLOW:
+                return Color.rgb(255, 255, 0, 0.3); // Półprzezroczysty żółty
+            case PURPLE:
+                return Color.rgb(128, 0, 128, 0.3); // Półprzezroczysty fioletowy
+            case BLACK:
+                return Color.rgb(0, 0, 0, 0.3); // Półprzezroczysty czarny
+            default:
+                return Color.TRANSPARENT; // Brak koloru
         }
     }
 
