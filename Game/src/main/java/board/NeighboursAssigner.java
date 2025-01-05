@@ -27,6 +27,8 @@ public class NeighboursAssigner {
             tryAddNeighbour(field, row + 1, col + 1); // Prawy dolny
             tryAddNeighbour(field, row + 1, col - 1); // Lewy dolny
             tryAddNeighbour(field, row - 1, col - 1); // Lewy górny
+            tryAddNeighbour(field, row, col - 2);          // Lewy
+            tryAddNeighbour(field, row, col + 2);          // Prawy
         }
     }
 
