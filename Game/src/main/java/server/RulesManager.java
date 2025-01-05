@@ -1,6 +1,8 @@
 package server;
 import board.Field;
 import board.enums.HomeColor;
+import board.enums.PieceColor;
+
 import java.util.*;
 
 public class RulesManager {
@@ -100,15 +102,39 @@ public class RulesManager {
             return false;
         }
 
-        // Sprawdź, czy pionek na polu startowym należy do gracza
-        HomeColor homeColor = startField.getHome();
-        Mediator owner = homeAssignments.get(homeColor);
+        // Sprawdź, czy pionek na polu należy do gracza
+        PieceColor pieceColor = startField.getPiece().getColor();
 
-        if (owner == null || owner != player) {
+        if (!playerOwnsPiece(player, pieceColor)) {
             player.sendMessage("Invalid move: You can only move your own pieces!");
             return false;
         }
 
         return true; // Ruch jest poprawny
+    }
+
+    private boolean playerOwnsPiece(Mediator player, PieceColor pieceColor) {
+        HomeColor playerHome = null;
+
+        // Znajdź HomeColor przypisany do gracza
+        for (Map.Entry<HomeColor, Mediator> entry : homeAssignments.entrySet()) {
+            if (entry.getValue().equals(player)) {
+                playerHome = entry.getKey();
+                break;
+            }
+        }
+
+        if (playerHome == null) return false;
+
+        // Mapowanie koloru domku na kolor pionka
+        switch (playerHome) {
+            case RED: return pieceColor == PieceColor.RED_PIECE;
+            case BLUE: return pieceColor == PieceColor.BLUE_PIECE;
+            case YELLOW: return pieceColor == PieceColor.YELLOW_PIECE;
+            case BLACK: return pieceColor == PieceColor.BLACK_PIECE;
+            case GREEN: return pieceColor == PieceColor.GREEN_PIECE;
+            case PURPLE: return pieceColor == PieceColor.PURPLE_PIECE;
+            default: return false;
+        }
     }
 }
