@@ -21,7 +21,32 @@
             <artifactId>javafx-controls</artifactId>
             <version>21</version>
         </dependency>
-    </dependencies>
+
+
+        <!-- JUnit 5 (JUnit Jupiter) for testing -->
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.9.3</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+
+<build>
+<plugins>
+    <!-- Plugin Surefire for running tests -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M8</version>
+        <configuration>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+        </configuration>
+    </plugin>
+</plugins>
+</build>
 
     <repositories>
         <repository>
@@ -29,6 +54,5 @@
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
-
 
 </project>
