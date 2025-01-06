@@ -55,10 +55,11 @@ public class GameManager {
             chooseBoard(player, command);
         } else if (elementsOfCommand[0].equals("move")) {
             processMove(player, command);
+        } else if (command.equals("skip")) {
+            skipTurn(player);
         } else {
             player.sendMessage("Invalid command: " + command);
         }
-
     }
 
     // Rozpoczęcie gry
@@ -137,5 +138,26 @@ public class GameManager {
 
         movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
         rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+    }
+
+    // Pominięcie ruchu
+    private void skipTurn(Mediator player) {
+        if (!gameStarted) {
+            player.sendMessage("Game has not started yet.");
+            return;
+        }
+        if (player != rulesManager.getCurrentPlayer()) {
+            player.sendMessage("It's not your turn!");
+            return;
+        }
+
+        // Pobierz kolor gracza, który rezygnuje
+        String playerColor = rulesManager.getPlayerColor(player);
+
+        // Powiadom wszystkich graczy o rezygnacji z ruchu
+        notifyObservers(String.format("Turn skipped by %s", playerColor));
+
+        // Przejdź do następnego gracza
+        rulesManager.nextPlayer();
     }
 }

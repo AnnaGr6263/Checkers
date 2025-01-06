@@ -137,4 +137,14 @@ public class RulesManager {
             default: return false;
         }
     }
+
+    // Pobierz kolor gracza na podstawie przypisanego domku
+    public String getPlayerColor(Mediator player) {
+        for (Map.Entry<HomeColor, Mediator> entry : homeAssignments.entrySet()) {
+            if (entry.getValue().equals(player)) {
+                return entry.getKey().name(); // Zwraca nazwę koloru gracza
+            }
+        }
+        return "Unknown";
+    }
 }
