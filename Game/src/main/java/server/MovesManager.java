@@ -12,7 +12,7 @@ public class MovesManager {
     private GUIMoves guiMoves;
     private GameManager gameManager;
 
-    public MovesManager(Mediator player, GameManager gameManager, Field startField, Field endField) {
+    public MovesManager(Mediator player,GameManager gameManager, Field startField, Field endField) {
         this.player = player;
         this.gameManager = gameManager;
 
@@ -49,7 +49,7 @@ public class MovesManager {
     private boolean isValidMove() {
 
         // Na samym początku sprawdzenie ruchu prostego (na sąsiednie pole)
-        if (startField.getNeighbours().contains(endField) && !endField.hasPiece()) {
+        if (startField.getNeighbours().contains(endField) && !endField.hasPiece() && startField.hasPiece()) {
             return true;
         }
 
@@ -72,6 +72,7 @@ public class MovesManager {
             Piece piece = startField.getPiece(); // Pobierz pionek z pola początkowego
 
             // Wyślij powiadomienie do wszystkich graczy
+
             String message = String.format("Move performed by %s: %dx%d -> %dx%d",
                     piece.getColor(), // Kolor pionka wykonującego ruch
                     startField.getRow(), startField.getCol(),

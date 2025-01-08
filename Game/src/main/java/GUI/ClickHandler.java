@@ -3,6 +3,7 @@ package GUI;
 import board.Field;
 import javafx.scene.input.MouseEvent;
 import server.GameManager;
+import server.MovesManager;
 
 public class ClickHandler {
     private Field selectedStartField; // Wybrane pole początkowe
@@ -10,26 +11,38 @@ public class ClickHandler {
 
     public ClickHandler() {}
 
-
-    // Obsługa kliknięcia na pole
     public void handle(MouseEvent event, Field clickedField) {
-        System.out.println("mouse event worked");
-
         if (selectedStartField == null) {
-            // Jeśli nie wybrano jeszcze pola początkowego, ustaw je
             selectedStartField = clickedField;
             System.out.println("Selected start field: " + selectedStartField);
         } else {
-            // Jeśli wybrano pole początkowe, ustaw pole końcowe
             selectedEndField = clickedField;
-            System.out.println("Selected end field: " + selectedEndField);
 
             GameManager.getInstance().processMoveFromClick(selectedStartField, selectedEndField);
 
-            // Zresetuj zaznaczenia po wykonaniu ruchu
+
+            /*
+            // Walidacja ruchu w GUI
+            if (isMoveValid(selectedStartField, selectedEndField)) {
+                GameManager.getInstance().processMoveFromClick(selectedStartField, selectedEndField);
+            } else {
+                System.out.println("Invalid move!");
+                //GUI.getInstance().showError("Invalid move!");
+            }
+
+            // Resetuj zaznaczenie pól
+            //GUI.getInstance().highlightField(selectedStartField, false);*/
             selectedStartField = null;
             selectedEndField = null;
         }
+    }
+
+    private boolean isMoveValid(Field start, Field end) {
+        if (start == null || end == null) return false;
+
+        // Sprawdź, czy pole końcowe jest sąsiadem
+        return start.getNeighbours().contains(end) && !end.hasPiece();
+
     }
 
     public Field getSelectedEndField() {

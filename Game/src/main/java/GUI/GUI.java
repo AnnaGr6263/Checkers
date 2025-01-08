@@ -25,7 +25,6 @@ public class GUI extends Application {
     private BoardSetup board; // Obiekt planszy
     private ClickHandler clickHandler = new ClickHandler();
 
-
     // Ustawienie planszy do wykorzystania przez GUI
     public static void setBoard(BoardSetup board) {
         boardToInitialize = board; // Przechowaj dowolną instancję klasy BoardSetup
