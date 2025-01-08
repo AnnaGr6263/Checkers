@@ -40,4 +40,9 @@ public class ChooseBoard {
     public BoardSetup getBoard() {
         return board;
     }
+
+    // metoda tylko do testów z mockami
+    public void setTestBoard(BoardSetup TestBoard) {
+        this.board = TestBoard;
+    }
 }

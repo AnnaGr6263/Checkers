@@ -78,9 +78,9 @@ public class GameManager {
         }
         gameStarted = true; // Ustawienie flagi rozpoczęcia gry
         notifyObservers("Game started with " + players.size() + " players on the chosen board!");
+
         // Jak już mamy określoną liczbę graczy to wypałniamy odpowiednio pionami konkretne domki
-        FillWIthPieces fillWIthPieces = new FillWIthPieces(players);
-        fillWIthPieces.fill();
+        FillWIthPieces fillWIthPieces = new FillWIthPieces(players.size());
 
         // Utworzenie RulesManager i rozpoczęcie gry
         rulesManager = new RulesManager(players);
@@ -123,19 +123,19 @@ public class GameManager {
             player.sendMessage("Game has not started yet.");
             return;
         }
-        // Utworzenie obiektu MovesManager
-        MovesManager movesManager = new MovesManager(player, command, this);
-
-        Field startField = movesManager.getStartField(); // Pobierz pole startowe
-        if (startField == null) {
-            player.sendMessage("Invalid move: The starting field does not exist.");
-            return;
+        // Utworzenie obiektu zajmującego się sprawdzaniem poprawności komendy i jej składni
+        CommandManager commandManager = new CommandManager(player, command);
+        if (!commandManager.isMoveIntoStar()) {
+            return; // Nieprawidłowa komenda lub pola są poza gwiazdą
         }
+        Field startField = commandManager.getStartField();
+        Field endField = commandManager.getEndField();
 
-        if (!rulesManager.canPlayerMove(player, movesManager.getStartField())) {
+        if (!rulesManager.canPlayerMove(player, startField)) {
             return; // Gracz nie ma prawa wykonać ruchu
         }
 
+        MovesManager movesManager = new MovesManager(player, this, startField, endField);
         movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
         rulesManager.nextPlayer();          // Przejście do kolejnego gracza
     }
