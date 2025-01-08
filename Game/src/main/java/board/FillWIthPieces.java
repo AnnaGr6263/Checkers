@@ -8,16 +8,16 @@ import java.util.List;
 
 public class FillWIthPieces {
 
-    private List<Mediator> players;         // Gracze, czyli klienci, dla których rozpoczęła się gra
+    private int numberOfPlayers;         // Liczba graczy, czyli klientów, dla których rozpoczęła się gra
     private List<Field> playingFields = ChooseBoard.getInstance().getBoard().getFieldsInsideAStar();        // Pola używane do gry
 
 
-    public FillWIthPieces(List<Mediator> players) {
-        this.players = players;
+    public FillWIthPieces(int players) {
+        this.numberOfPlayers = players;
+        fill();
     }
 
     public void fill() {
-        int numberOfPlayers = players.size();
 
         switch (numberOfPlayers) {
             case 2:
