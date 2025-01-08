@@ -6,11 +6,7 @@ import javafx.application.Platform;
 
 public class GUIMoves {
 
-    private final GUI gui;
-
-    public GUIMoves(GUI gui) {
-        this.gui = gui; // Referencja do instancji GUI
-    }
+    public GUIMoves() {}
 
     // Aktualizacja GUI po wykonaniu ruchu
     public void updateMove(Field startField, Field endField) {
@@ -27,6 +23,6 @@ public class GUIMoves {
         }
 
         // Odśwież GUI, aby pokazać zmiany
-        Platform.runLater(() -> gui.refresh());
+        Platform.runLater(() -> GUI.getInstance().refresh());
     }
 }

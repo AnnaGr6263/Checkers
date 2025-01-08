@@ -21,7 +21,7 @@ public class MovesManager {
 
         // Uzyskaj instancję GUI i zainicjalizuj GUIMoves
         GUI gui = GUI.getInstance();
-        this.guiMoves = new GUIMoves(gui);
+        this.guiMoves = new GUIMoves();
     }
 
     public Field getStartField() {
