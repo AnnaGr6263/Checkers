@@ -9,10 +9,18 @@ import java.util.List;
 
 public class GameManager {
 
+    private static GameManager gameManagerInstance;             // Jedyna instancja klasy GameManager
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
-    private final List<Mediator> players = new ArrayList<>(); // Lista graczy
+    private final List<Mediator> players = new ArrayList<>();   // Lista graczy
     private boolean gameStarted = false;
     private RulesManager rulesManager; // Zarządca zasad gry
+
+    public static GameManager getInstance() {
+        if (gameManagerInstance == null) {
+            throw new IllegalStateException("GameManager instance has not been initialized yet!");
+        }
+        return gameManagerInstance;
+    }
 
     // Dodanie obserwatora
     public void addObserver(Observer observer) {
@@ -158,6 +166,18 @@ public class GameManager {
         notifyObservers(String.format("Turn skipped by %s", playerColor));
 
         // Przejdź do następnego gracza
+        rulesManager.nextPlayer();
+    }
+
+    public void processMoveFromClick(Field selectedStartField, Field selectedEndField) {
+        Mediator currentPlayer = rulesManager.getCurrentPlayer();
+        if (!rulesManager.canPlayerMove(currentPlayer, selectedStartField)) {
+            return; // Gracz nie ma prawa wykonać ruchu
+        }
+
+        System.out.println("wchodzi do process move w move manager");
+        MovesManager movesManager = new MovesManager(currentPlayer, this, selectedStartField, selectedEndField);
+        movesManager.performMove();
         rulesManager.nextPlayer();
     }
 }

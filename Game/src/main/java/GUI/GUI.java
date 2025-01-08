@@ -15,12 +15,16 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javafx.scene.input.MouseEvent;
+
 public class GUI extends Application {
 
     private static GUI guiInstance; // Singleton - jedyna instancja klasy GUI
     private static BoardSetup boardToInitialize; // Plansza przekazywana do GUI przed uruchomieniem
     private Pane root; // Główny kontener GUI
     private BoardSetup board; // Obiekt planszy
+    private ClickHandler clickHandler = new ClickHandler();
+
 
     // Ustawienie planszy do wykorzystania przez GUI
     public static void setBoard(BoardSetup board) {
@@ -120,6 +124,7 @@ public class GUI extends Application {
             double y = OFFSET_Y + (row - 8) * (CELL_SIZE * 0.866);
 
             Circle circle = new Circle(x, y, CELL_SIZE / 2.5); // Pole jako koło
+            circle.setOnMouseClicked(mouseEvent -> handleFieldClick(mouseEvent, field));
             circle.setStroke(Color.BLACK); // Obrys koła
             circle.setStrokeWidth(1.5); // Grubość obrysu
 
@@ -161,6 +166,9 @@ public class GUI extends Application {
                 root.getChildren().add(transparentCircle);
             }
         }
+    }
+    private void handleFieldClick(MouseEvent event, Field field) {
+        clickHandler.handle(event, field);
     }
 
     // Pobierz półprzezroczysty kolor dla domku na podstawie HomeColor

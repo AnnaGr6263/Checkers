@@ -70,8 +70,6 @@ public class MovesManager {
         } else {
             // Przenieś pionek
             Piece piece = startField.getPiece(); // Pobierz pionek z pola początkowego
-            startField.removePiece();           // Usuń pionek z pola początkowego
-            endField.setPiece(piece);           // Ustaw pionek na polu końcowym
 
             // Wyślij powiadomienie do wszystkich graczy
             String message = String.format("Move performed by %s: %dx%d -> %dx%d",
