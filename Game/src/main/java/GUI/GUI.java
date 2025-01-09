@@ -7,7 +7,10 @@ import board.enums.HomeColor;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -16,6 +19,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import javafx.scene.input.MouseEvent;
+import server.GameManager;
 
 public class GUI extends Application {
 
@@ -24,6 +28,9 @@ public class GUI extends Application {
     private Pane root; // Główny kontener GUI
     private BoardSetup board; // Obiekt planszy
     private ClickHandler clickHandler = new ClickHandler();
+
+    private TextField moveInput; // Pole tekstowe do wprowadzania ruchów
+    private Button submitButton; // Przycisk do zatwierdzania ruchów
 
     // Ustawienie planszy do wykorzystania przez GUI
     public static void setBoard(BoardSetup board) {
@@ -53,11 +60,41 @@ public class GUI extends Application {
         drawFields(); // Rysowanie pól planszy
         drawPieces(); // Rysowanie pionków
 
+        // Dodaj interfejs do wprowadzania ruchów
+        VBox controls = createControls();
+        controls.setLayoutX(10);
+        controls.setLayoutY(10);
+        root.getChildren().add(controls);
+
         // Konfiguracja sceny
         Scene scene = new Scene(root, 800, 600, Color.WHITE);
         primaryStage.setTitle("Chinese Checkers Board"); // Tytuł okna
         primaryStage.setScene(scene);
         primaryStage.show(); // Wyświetlenie okna
+    }
+
+    // Tworzy interfejs do wprowadzania ruchów
+    private VBox createControls() {
+        moveInput = new TextField();
+        moveInput.setPromptText("Enter move [0-16]x[0-24]->[0-16]x[0-24])");
+
+        submitButton = new Button("Submit Move");
+        submitButton.setOnAction(event -> handleMoveInput());
+
+        VBox vbox = new VBox(10, moveInput, submitButton);
+        return vbox;
+    }
+
+    // Obsługa wprowadzonego ruchu
+    private void handleMoveInput() {
+        String move = moveInput.getText();
+        if (move == null || move.isEmpty()) {
+            System.out.println("Move input is empty.");
+            return;
+        }
+
+        // Przekazanie ruchu do GameManager
+        GameManager.getInstance().processMoveFromGUI(move);
     }
 
     // Odświeżanie GUI

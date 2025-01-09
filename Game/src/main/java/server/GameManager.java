@@ -15,7 +15,7 @@ public class GameManager {
     private boolean gameStarted = false;
     private RulesManager rulesManager; // Zarządca zasad gry
 
-    public static GameManager getInstance() {
+    public static synchronized GameManager getInstance() {
         if (gameManagerInstance == null) {
             throw new IllegalStateException("GameManager instance has not been initialized yet!");
         }
@@ -179,5 +179,29 @@ public class GameManager {
         MovesManager movesManager = new MovesManager(currentPlayer, this, selectedStartField, selectedEndField);
         movesManager.performMove();
         rulesManager.nextPlayer();
+    }
+
+    public void processMoveFromGUI(String move) {
+        System.out.println("wchodzi w metode process od GUI");
+        if (!gameStarted) {
+            System.out.println("Game has not started yet.");
+            return;
+        }
+        Mediator player = rulesManager.getCurrentPlayer();
+        CommandManager commandManager = new CommandManager(player, move);
+
+        if (!commandManager.isMoveIntoStar()) {
+            return; // Nieprawidłowa komenda lub pola są poza gwiazdą
+        }
+        Field startField = commandManager.getStartField();
+        Field endField = commandManager.getEndField();
+
+        if (!rulesManager.canPlayerMove(player, startField)) {
+            return; // Gracz nie ma prawa wykonać ruchu
+        }
+
+        MovesManager movesManager = new MovesManager(player, this, startField, endField);
+        movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
+        rulesManager.nextPlayer();          // Przejście do kolejnego gracza
     }
 }
