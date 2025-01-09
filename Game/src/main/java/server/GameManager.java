@@ -143,9 +143,13 @@ public class GameManager {
             return; // Gracz nie ma prawa wykonać ruchu
         }
 
-        MovesManager movesManager = new MovesManager(player, this, startField, endField);
-        movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
-        rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+        MovesManager movesManager = new MovesManager(this, startField, endField);
+        if(movesManager.isValidMove()) {
+            movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
+            rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+        } else {
+            player.sendMessage("Invalid move.");
+        }
     }
 
     // Pominięcie ruchu
@@ -176,7 +180,7 @@ public class GameManager {
         }
 
         System.out.println("wchodzi do process move w move manager");
-        MovesManager movesManager = new MovesManager(currentPlayer, this, selectedStartField, selectedEndField);
+        MovesManager movesManager = new MovesManager(this, selectedStartField, selectedEndField);
         movesManager.performMove();
         rulesManager.nextPlayer();
     }
@@ -200,7 +204,7 @@ public class GameManager {
             return; // Gracz nie ma prawa wykonać ruchu
         }
 
-        MovesManager movesManager = new MovesManager(player, this, startField, endField);
+        MovesManager movesManager = new MovesManager(this, startField, endField);
         movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
         rulesManager.nextPlayer();          // Przejście do kolejnego gracza
     }
