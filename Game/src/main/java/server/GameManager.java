@@ -135,9 +135,13 @@ public class GameManager {
             return; // Gracz nie ma prawa wykonać ruchu
         }
 
-        MovesManager movesManager = new MovesManager(player, this, startField, endField);
-        movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
-        rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+        MovesManager movesManager = new MovesManager(this, startField, endField);
+        if(movesManager.isValidMove()) {
+            movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
+            rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+        } else {
+            player.sendMessage("Invalid move");
+        }
     }
 
     // Pominięcie ruchu
