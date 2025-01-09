@@ -24,11 +24,30 @@ public class FillWIthPieces {
                 for(Field field : playingFields) {
                     // Wypełnianie domków - jak mamy dwóch graczy to gramy tylko niebieskimi i czerwonymi pionami
                     if(field.getHome() == HomeColor.RED ) {
+
                         Piece redPiece = new Piece(PieceColor.RED_PIECE);       // Utworzenie czerwonego pionka
                         field.setPiece(redPiece);
+
+                        // Jesteśmy w grze dla 2 osób, więc musimy grać 15 pionami, nie 10 tak jak jest to domyślnie
+                        // Wobec tego pobieramy sobie sąsiadów dla aktualnego ustwienia domku i Ci sąsiedzi
+                        // (dla 4 granicznych pól jest to 5 pól) też zostają domkiem
+                        for(Field neighbour : field.getNeighbours()) {
+                            if(neighbour.getHome() == HomeColor.NONE) {
+                                neighbour.setHome(HomeColor.RED);
+                                neighbour.setPiece(redPiece);
+                            }
+                        }
+
                     } else if (field.getHome() == HomeColor.BLUE) {
                         Piece bluePiece = new Piece(PieceColor.BLUE_PIECE);
                         field.setPiece(bluePiece);
+
+                        for(Field neighbour : field.getNeighbours()) {
+                            if(neighbour.getHome() == HomeColor.NONE) {
+                                neighbour.setHome(HomeColor.BLUE);
+                                neighbour.setPiece(bluePiece);
+                            }
+                        }
                     } else {
                         field.setHome(HomeColor.NONE);     // Ustawienie z powrotem pola jako normalne pole do gry
                     }
