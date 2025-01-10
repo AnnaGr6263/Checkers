@@ -1,7 +1,6 @@
 package board;
 
 import board.mocks.MockBoardSetup;
-import com.sun.jdi.ArrayReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
