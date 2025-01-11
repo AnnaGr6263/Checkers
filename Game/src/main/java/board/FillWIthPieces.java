@@ -2,8 +2,6 @@ package board;
 import board.enums.HomeColor;
 import board.enums.PieceColor;
 import server.ChooseBoard;
-import server.Mediator;
-
 import java.util.List;
 
 public class FillWIthPieces {

@@ -5,12 +5,14 @@ import board.enums.PieceColor;
 import board.mocks.MockBoardSetup;
 import org.junit.jupiter.api.Test;
 import server.ChooseBoard;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FillWIthPiecesTest {
+public class FillWithPiecesTest {
 
     private List<Field> mockFields;
     private FillWIthPieces fillWithPieces;
@@ -124,3 +126,5 @@ class FillWIthPiecesTest {
         assertEquals(2, yellowCount);
     }
 }
+
+

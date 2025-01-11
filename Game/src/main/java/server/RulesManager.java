@@ -126,25 +126,35 @@ public class RulesManager {
 
         if (playerHome == null) return false;
 
-        // Mapowanie koloru domku na kolor pionka
-        switch (playerHome) {
-            case RED: return pieceColor == PieceColor.RED_PIECE;
-            case BLUE: return pieceColor == PieceColor.BLUE_PIECE;
-            case YELLOW: return pieceColor == PieceColor.YELLOW_PIECE;
-            case BLACK: return pieceColor == PieceColor.BLACK_PIECE;
-            case GREEN: return pieceColor == PieceColor.GREEN_PIECE;
-            case PURPLE: return pieceColor == PieceColor.PURPLE_PIECE;
-            default: return false;
-        }
+        return pieceColor == mapHomeColorToPieceColor(playerHome);
     }
 
     // Pobierz kolor gracza na podstawie przypisanego domku
-    public String getPlayerColor(Mediator player) {
+    public PieceColor getPlayerColor(Mediator player) {
         for (Map.Entry<HomeColor, Mediator> entry : homeAssignments.entrySet()) {
             if (entry.getValue().equals(player)) {
-                return entry.getKey().name(); // Zwraca nazwę koloru gracza
+                return mapHomeColorToPieceColor(entry.getKey());  // Zwraca kolor gracza
             }
         }
-        return "Unknown";
+        return null;
+    }
+    // Metoda pomocnicza do mapowania HomeColor na PieceColor
+    private PieceColor mapHomeColorToPieceColor(HomeColor homeColor) {
+        switch (homeColor) {
+            case RED:
+                return PieceColor.RED_PIECE;
+            case BLUE:
+                return PieceColor.BLUE_PIECE;
+            case GREEN:
+                return PieceColor.GREEN_PIECE;
+            case BLACK:
+                return PieceColor.BLACK_PIECE;
+            case YELLOW:
+                return PieceColor.YELLOW_PIECE;
+            case PURPLE:
+                return PieceColor.PURPLE_PIECE;
+            default:
+                throw new IllegalArgumentException("Invalid HomeColor: " + homeColor);
+        }
     }
 }
