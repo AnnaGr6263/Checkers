@@ -1,5 +1,6 @@
 package server;
 import board.BoardSetup;
+import board.DestinationHome;
 import board.Field;
 import board.FillWIthPieces;
 import board.enums.PieceColor;
@@ -14,7 +15,9 @@ public class GameManager {
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
     private final List<Mediator> players = new ArrayList<>();   // Lista graczy
     private boolean gameStarted = false;
-    private RulesManager rulesManager; // Zarządca zasad gry
+    private boolean gameEnded = false;
+    private RulesManager rulesManager;                          // Zarządca zasad gry
+    private VictoryManager victoryManager;                      // Zarządca wygranej
 
     private GameManager(){}            // Prywatny konstruktor
 
@@ -62,7 +65,11 @@ public class GameManager {
 
     // Obsługa komend
     public synchronized void handleCommand(Mediator player, String command) {
-
+        // Jeśli gra się skończyła nie obsuguje już żadnych komend
+        if (gameEnded) {
+            player.sendMessage("The game has ended. No more moves can be made.");
+            return;
+        }
         String[] elementsOfCommand = command.split(" "); // Podział komendy na elementy
 
         if(command.equals("join")) {
@@ -97,10 +104,17 @@ public class GameManager {
         gameStarted = true; // Ustawienie flagi rozpoczęcia gry
         notifyObservers("Game started with " + players.size() + " players on the chosen board!");
 
+        // Jak już mamy wybraną planszę to definiujemy, która pola są na przeciwko, bo tam będą zmierzać pionki
+        DestinationHome destinationHome = new DestinationHome();
+        destinationHome.attachDestinationHomes();
+
         // Jak już mamy określoną liczbę graczy to wypałniamy odpowiednio pionami konkretne domki
         FillWIthPieces fillWIthPieces = new FillWIthPieces(players.size());
 
-        // Utworzenie RulesManager i rozpoczęcie gry
+        // Zaincjalizowanie VictoryManager i przekazanie do niego mapy z kolorami pionków i docelowymi polami
+        victoryManager = new VictoryManager(destinationHome.getDestinationHomesMap(), players.size());
+
+        // Zainicjalowanie RulesManager i rozpoczęcie gry
         rulesManager = new RulesManager(players);
         rulesManager.startGame();
 
@@ -157,6 +171,15 @@ public class GameManager {
         if(movesManager.isValidMove()) {
             movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
             rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+
+            // Sprawdzenie wygranej
+            if (victoryManager.checkVictory(rulesManager.getPlayerColor(player))) {
+                notifyObservers("Player with color " + rulesManager.getPlayerColor(player) + " takes " + victoryManager.whichPlace() +" place.");
+                if(victoryManager.isEnd()) {
+                    notifyObservers("End of the game.");
+                    gameEnded = true;
+                }
+            }
         } else {
             player.sendMessage("Invalid move.");
         }

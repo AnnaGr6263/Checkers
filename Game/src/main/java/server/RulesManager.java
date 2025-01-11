@@ -7,7 +7,6 @@ import java.util.*;
 
 public class RulesManager {
 
-    private static volatile RulesManager rulesManagerInstance;
     private final List<Mediator> players; // Lista graczy
     private final Map<HomeColor, Mediator> homeAssignments; // Przypisanie domków do graczy
     private int currentPlayerIndex; // Indeks aktualnego gracza
