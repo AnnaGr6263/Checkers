@@ -2,6 +2,9 @@ package server;
 
 import board.Field;
 
+/**
+ * Klasa odpowiedzialna za przetwarzanie komendy o schemacie: move [0-16]x[0-24]->[0-16]x[0-24]
+ */
 public class CommandManager {
 
     private String command;
@@ -9,6 +12,12 @@ public class CommandManager {
     private Field endField;
     private Mediator player;
 
+    /**
+     * Konstruktor.
+     *
+     * @param player Gracz, podający komendę.
+     * @param command Treść komendy.
+     */
     public CommandManager(Mediator player, String command) {
         this.player = player;
         this.command = command;
@@ -16,7 +25,11 @@ public class CommandManager {
         this.endField = null;
     }
 
-    // Metoda odpowiedzialna za sprawdzanie czy ruch jest poprawny w sensie mieszczenia się w ramach wybranej planszy
+    /**
+     * Metoda odpowiedzialna za sprawdzanie czy ruch jest poprawny w sensie mieszczenia się w ramach wybranej planszy.
+     *
+     * @return Prawdę, gdy ruch zawiera się w ramach planszy, fałsz w przeciwnym wypadku.
+     */
     public boolean isMoveIntoStar() {
         String[] commandWithoutWordMove = command.split(" "); // Podział komendy na części
         if(commandWithoutWordMove.length == 1) {
@@ -103,10 +116,20 @@ public class CommandManager {
         }
     }
 
+    /**
+     * Getter do pola końcowego.
+     *
+     * @return Zwraca pole końcowe.
+     */
     public Field getEndField() {
         return endField;
     }
 
+    /**
+     * Getter do pola początkowego.
+     *
+     * @return Zwraca pole początkowe.
+     */
     public Field getStartField() {
         return startField;
     }

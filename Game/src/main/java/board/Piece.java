@@ -2,14 +2,27 @@ package board;
 
 import board.enums.PieceColor;
 
+/**
+ * Klasa reprezentująca pionek.
+ */
 public class Piece {
-    private PieceColor color; // Kolor pionka
+    private PieceColor color;
 
+    /**
+     * Konstruktor.
+     *
+     * @param color Kolor pionka - jego podstawowa cecha, od której później zależy czyj on jest.
+     */
     public Piece(PieceColor color) {
         this.color = color;
     }
 
-    public PieceColor getColor() {          // Od koloru piona zależy czyj on jest
+    /**
+     * Getter koloru pionka.
+     *
+     * @return Zwraca kolor pionka.
+     */
+    public PieceColor getColor() {
         return color;
     }
 }

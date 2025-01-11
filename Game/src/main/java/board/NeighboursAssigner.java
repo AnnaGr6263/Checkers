@@ -4,11 +4,19 @@ import server.ChooseBoard;
 
 import java.util.List;
 
+/**
+ * Klasa przypisująca każdemu polu jego sąsiadów.
+ */
 public class NeighboursAssigner {
 
     private final BoardSetup board;
     private final List<Field> fieldsInsideAStar;
 
+    /**
+     * Konstruktor.
+     *
+     * @param board Plansza o określonym układzie, dla której będziemy przeprowadzać przypisywanie sąsaidów.
+     */
     public NeighboursAssigner(BoardSetup board) {
         if (board == null) {
             throw new IllegalArgumentException("Board cannot be null");
@@ -17,6 +25,9 @@ public class NeighboursAssigner {
         this.fieldsInsideAStar = board.getFieldsInsideAStar(); // Lista pól gwiazdy
     }
 
+    /**
+     * Metoda przypisująca sąsiadów.
+     */
     public void assignNeighbours() {
         for (Field field : fieldsInsideAStar) {
             int col = field.getCol();
@@ -32,6 +43,12 @@ public class NeighboursAssigner {
         }
     }
 
+    /**
+     * Metoda pomocnicza do przypisywania sąsiadów
+     * @param field Pole, któremu przydzielamy sąsiadów.
+     * @param row Wiersz.
+     * @param col Kolumna.
+     */
     private void tryAddNeighbour(Field field, int row, int col) {
         try {
             Field neighbour = board.getSpecificField(row, col);

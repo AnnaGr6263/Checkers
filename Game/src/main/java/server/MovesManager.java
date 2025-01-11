@@ -6,12 +6,21 @@ import board.Piece;
 
 import java.util.*;
 
+/**
+ * Klasa MovesManager odpowiedzialna za sprawdzanie czy zaproponowany przez gracza ruch jest zgodny z zasadami gry.
+ */
 public class MovesManager {
 
     private Field startField = null;
     private Field endField = null;
     private GUIMoves guiMoves;
 
+    /**
+     * Konstruktor.
+     *
+     * @param startField Pole początkowe zaproponowanego przez gracza ruchu.
+     * @param endField Pole końcowe zaproponowanego przez gracza ruchu.
+     */
     public MovesManager(Field startField, Field endField) {
         this.startField = startField;
         this.endField = endField;
@@ -21,11 +30,20 @@ public class MovesManager {
         this.guiMoves = new GUIMoves();
     }
 
+    /**
+     * Getter.
+     *
+     * @return Pole początkowe.
+     */
     public Field getStartField() {
         return startField;
     }
 
-    // Sprawdza, czy można wykonać skok nad pionkiem
+    /**
+     * Metoda sprawdza, czy można wykonać skok nad pionkiem
+     *
+     * @return Prawdę, jeśli można wykonać przeskok nad pionkiem
+     */
     private boolean canJumpOverPiece() {
         // Obliczenie pozycji pola pomiędzy startField a endField
         int midRow = (startField.getRow() + endField.getRow()) / 2;
@@ -36,7 +54,15 @@ public class MovesManager {
         // Pole pośrednie musi mieć pionek, a końcowe pole musi być puste
         return midField.hasPiece() && !endField.hasPiece();
     }
-    // Sprawdza, czy możliwy jest przeskok nad kilkoma pionami
+
+    /**
+     *  Sprawdza, czy możliwy jest przeskok nad kilkoma pionami.
+     *
+     * @param currentField Pole, na którym aktualnie stoi pionek na początku jest to pole startowe.
+     * @param targetField Pole, do którego chcemy dotrzeć.
+     * @param visitedFields Wszystkie pola, na których w trakcie wykonywania tej metody stanął pionek.
+     * @return Prawdę, gdy można wykonać przeskok nad wieloma pionkami.
+     */
     private boolean canMultiJump(Field currentField, Field targetField, Set<Field> visitedFields) {
         // Jeśli aktualne pole to pole docelowe, multi-jump jest możliwy
         if (currentField == targetField) {
@@ -79,6 +105,11 @@ public class MovesManager {
     }
 
     // Sprawdza czy można wykonać taki ruch
+    /**
+     * Sprawdza czy można wykonać taki ruch o zadanych w konstruktorze współrzędnych.
+     *
+     * @return Prawdę, jeśli ruch może zostać wykonany, w przeciwnym razie fałsz.
+     */
     public boolean isValidMove() {
 
         // Na samym początku sprawdzenie ruchu prostego (na sąsiednie pole)
@@ -95,6 +126,10 @@ public class MovesManager {
             return canMultiJump(startField, endField, visitedFields);
         }
     }
+
+    /**
+     * Metoda odpowiedzialna za wykonanie ruchu.
+     */
     public void performMove() {
 
         Piece piece = startField.getPiece(); // Pobierz pionek z pola początkowego
