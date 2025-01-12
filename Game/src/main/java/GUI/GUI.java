@@ -14,6 +14,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import server.GameManager;
 
 import javafx.scene.input.MouseEvent;
 
@@ -39,6 +40,10 @@ public class GUI extends Application {
             throw new IllegalStateException("GUI instance has not been initialized yet!");
         }
         return guiInstance;
+    }
+
+    private boolean isYinAndYangEnabled() {
+        return gameManager != null && gameManager.getYinAndYangManager().isYinAndYangEnabled();
     }
 
     @Override
@@ -119,6 +124,8 @@ public class GUI extends Application {
 
     // Rysowanie pól planszy
     private void drawFields() {
+        boolean isYinAndYang = isYinAndYangEnabled();
+
         for (Field field : board.getFieldsInsideAStar()) {
             int row = field.getRow(); // Wiersz pola
             int col = field.getCol(); // Kolumna pola
@@ -131,7 +138,10 @@ public class GUI extends Application {
             circle.setStroke(Color.BLACK); // Obrys koła
             circle.setStrokeWidth(1.5); // Grubość obrysu
 
-            if (field.getHome() != HomeColor.NONE && !field.hasPiece()) {
+            if (isYinAndYang && field.getHome() != HomeColor.NONE) {
+                // Jeśli Yin and Yang jest aktywne, wszystkie pola startowe i docelowe są przezroczyste
+                circle.setFill(Color.TRANSPARENT);
+            } else if (field.getHome() != HomeColor.NONE && !field.hasPiece()) {
                 // Ustaw półprzezroczysty kolor dla pustego domku
                 circle.setFill(getTransparentColorForHome(field.getHome()));
             } else if (field.getHome() != HomeColor.NONE) {
