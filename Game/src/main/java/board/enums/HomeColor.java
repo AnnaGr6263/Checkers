@@ -1,5 +1,8 @@
 package board.enums;
 
+/**
+ * Enum definiujący kolory domków i domki dla nich przeciwne.
+ */
 public enum HomeColor {
     NONE,   // Pole nie należy do żadnego domku
     RED,    // Górny róg
@@ -11,6 +14,11 @@ public enum HomeColor {
 
     private HomeColor opposite;
 
+    /**
+     * Zwróć domek przeciwny.
+     *
+     * @return Domek naprzeciwko.
+     */
     public HomeColor getOpposite() {
         return opposite;
     }

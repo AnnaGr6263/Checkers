@@ -4,6 +4,11 @@ import board.enums.HomeColor;
 
 import java.util.*;
 
+/**
+ * Klasa reprezentująca "dużą" planszę tzn. taką, której wewnętrzna część (sześciokąt) ma bok długości 5-ciu pól,
+ * a w każdym domku mieści się 10 pionów (W ogólności, ponieważ dla dwóch graczy później jest mała zmiana i wrzucamy
+ * po 15 pionków do domku).
+ */
 public class BigBoard extends BoardSetup{
 
     private int height = 17;          // Liczba wierszy
@@ -11,11 +16,19 @@ public class BigBoard extends BoardSetup{
     private List<Field> whole_board = new ArrayList<>();
     private List<Field> fieldsInsideAStar = new ArrayList<>();     // Pola, które zawiera nasze pole gry czyli gwiazda
 
+    /**
+     * Getter.
+     *
+     * @return Listę pól, które należą do planszy (na których toczy się gra).
+     */
     @Override
     public List<Field> getFieldsInsideAStar() {
         return fieldsInsideAStar;
     }
 
+    /**
+     * Ustawia cały cały układ planszy.
+     */
     @Override
     public void boardGenerator() {
 
@@ -33,6 +46,9 @@ public class BigBoard extends BoardSetup{
     }
 
 
+    /**
+     * Metoda pomocnicza, generuje środek planszy.
+     */
     private void centerGenerator() {
         // Dolna część środka
         int k=0;
@@ -56,6 +72,9 @@ public class BigBoard extends BoardSetup{
         }
     }
 
+    /**
+     * Metoda pomocnicza, generuje rogi planszy (ramiona gwiazdy).
+     */
     private void cornersGenerator() {
 
         // Górny róg - CZERWONY
@@ -127,12 +146,21 @@ public class BigBoard extends BoardSetup{
         }
     }
 
-    public void assignNeighbours() {
+    /**
+     * Przypisuje każdemu utworzonemu polu, które jest wewnątrzz planszy, jego sąsiadów
+     */
+    private void assignNeighbours() {
         NeighboursAssigner neighboursAssigner = new NeighboursAssigner(this);
         neighboursAssigner.assignNeighbours();
     }
 
-    // Zwraca pole o konkretnych współrzędnych
+    /**
+     * Zwraca pole o konkretnych współrzędnych.
+     *
+     * @param row Wiersz.
+     * @param column Kolumna.
+     * @return Pole o przekazanych współrzędnych.
+     */
     @Override
     public Field getSpecificField(int row, int column) {
         if(row >= 0 && row < height && column >= 0 && column < width) {
