@@ -14,6 +14,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import server.GameManager;
 
 public class GUI extends Application {
 
@@ -21,6 +22,7 @@ public class GUI extends Application {
     private static BoardSetup boardToInitialize; // Plansza przekazywana do GUI przed uruchomieniem
     private Pane root; // Główny kontener GUI
     private BoardSetup board; // Obiekt planszy
+    private static GameManager gameManager;
 
     // Ustawienie planszy do wykorzystania przez GUI
     public static void setBoard(BoardSetup board) {
@@ -34,6 +36,15 @@ public class GUI extends Application {
         }
         return guiInstance;
     }
+
+    public static void setGameManager(GameManager manager) {
+        gameManager = manager;
+    }
+
+    private boolean isYinAndYangEnabled() {
+        return gameManager != null && gameManager.getYinAndYangManager().isYinAndYangEnabled();
+    }
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -112,6 +123,8 @@ public class GUI extends Application {
 
     // Rysowanie pól planszy
     private void drawFields() {
+        boolean isYinAndYang = isYinAndYangEnabled();
+
         for (Field field : board.getFieldsInsideAStar()) {
             int row = field.getRow(); // Wiersz pola
             int col = field.getCol(); // Kolumna pola
@@ -123,7 +136,10 @@ public class GUI extends Application {
             circle.setStroke(Color.BLACK); // Obrys koła
             circle.setStrokeWidth(1.5); // Grubość obrysu
 
-            if (field.getHome() != HomeColor.NONE && !field.hasPiece()) {
+            if (isYinAndYang && field.getHome() != HomeColor.NONE) {
+                // Jeśli Yin and Yang jest aktywne, wszystkie pola startowe i docelowe są przezroczyste
+                circle.setFill(Color.TRANSPARENT);
+            } else if (field.getHome() != HomeColor.NONE && !field.hasPiece()) {
                 // Ustaw półprzezroczysty kolor dla pustego domku
                 circle.setFill(getTransparentColorForHome(field.getHome()));
             } else if (field.getHome() != HomeColor.NONE) {
@@ -150,7 +166,7 @@ public class GUI extends Application {
 
             if (piece != null) {
                 // Rysuj pionek jako koło
-                Circle pieceCircle = new Circle(x, y, CELL_SIZE / 3.0);
+                Circle pieceCircle = new Circle(x, y, CELL_SIZE / 2.5);
                 pieceCircle.setFill(getColorForPiece(piece)); // Kolor pionka
                 root.getChildren().add(pieceCircle);
             } else if (field.getHome() != HomeColor.NONE) {

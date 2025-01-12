@@ -28,7 +28,7 @@ public class DestinationHome {
         destinationHomesMap.put(PieceColor.GREEN_PIECE, getList(HomeColor.GREEN.getOpposite()));
         destinationHomesMap.put(PieceColor.YELLOW_PIECE, getList(HomeColor.YELLOW.getOpposite()));
     }
-    private List<Field> getList(HomeColor homeColor) {
+    public List<Field> getList(HomeColor homeColor) {
         List<Field> neededFields = new ArrayList<>();           // Do przechowania pól o określonym kolorze domku
         List<Field> playingFields = ChooseBoard.getInstance().getBoard().getFieldsInsideAStar();
 

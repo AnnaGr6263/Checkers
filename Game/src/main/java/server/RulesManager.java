@@ -11,12 +11,14 @@ public class RulesManager {
     private final Map<HomeColor, Mediator> homeAssignments; // Przypisanie domków do graczy
     private int currentPlayerIndex; // Indeks aktualnego gracza
     private boolean gameStarted; // Flaga informująca o rozpoczęciu gry
+    private final GameManager gameManager;
 
-    public RulesManager(List<Mediator> players) {
+    public RulesManager(List<Mediator> players, GameManager gameManager) {
         this.players = players;
         this.homeAssignments = new HashMap<>();
         this.currentPlayerIndex = 0; // Start od losowego gracza
         this.gameStarted = false;
+        this.gameManager = gameManager; // Przypisanie GameManager
     }
 
     // Rozpocznij grę i przypisz domki do graczy
@@ -25,13 +27,17 @@ public class RulesManager {
             throw new IllegalStateException("Game has already started.");
         }
 
-        assignHomes(); // Przypisanie domków do graczy
+        if (!gameManager.getYinAndYangManager().isYinAndYangEnabled()) {
+            assignHomes(); // Przypisanie domków do graczy tylko w trybie klasycznym
+        }
+
         shufflePlayers(); // Losowe ustawienie kolejności graczy
         gameStarted = true;
     }
 
     // Przypisz domki do graczy w zależności od liczby graczy
     private void assignHomes() {
+
         List<HomeColor> availableHomes = getHomesForPlayerCount(players.size());
 
         if (availableHomes == null) {
@@ -42,7 +48,7 @@ public class RulesManager {
             Mediator player = players.get(i);
             HomeColor home = availableHomes.get(i);
             homeAssignments.put(home, player); // Przypisanie gracza do domku
-            player.sendMessage("Your home color: " + home.name());
+           player.sendMessage("Your home color: " + home.name());
         }
     }
 

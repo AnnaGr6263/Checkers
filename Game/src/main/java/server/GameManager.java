@@ -1,13 +1,12 @@
 package server;
-import board.BoardSetup;
-import board.DestinationHome;
-import board.Field;
-import board.FillWIthPieces;
+import board.*;
+import board.enums.HomeColor;
 import board.enums.PieceColor;
 import javafx.application.Application;
 import GUI.GUI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameManager {
 
@@ -17,6 +16,7 @@ public class GameManager {
     private boolean gameEnded = false;
     private RulesManager rulesManager;                          // Zarządca zasad gry
     private VictoryManager victoryManager;                      // Zarządca wygranej
+    private final YinAndYangManager yinAndYangManager = new YinAndYangManager(this);
 
     // Dodanie obserwatora
     public void addObserver(Observer observer) {
@@ -30,10 +30,27 @@ public class GameManager {
         }
     }
 
+    public List<Mediator> getPlayers() {
+        return players;
+    }
+
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    public YinAndYangManager getYinAndYangManager() {
+        return yinAndYangManager;
+    }
+
+
     // Dodanie gracza
     public synchronized boolean addPlayer(Mediator player) {
         if (gameStarted) {
             player.sendMessage("Game has already started. You cannot join.");
+            return false;
+        }
+        if (yinAndYangManager.isYinAndYangEnabled() && players.size() >= 2) {
+            player.sendMessage("Cannot join. Yin and Yang allows only 2 players.");
             return false;
         }
         if (players.size() >= 6) {
@@ -43,6 +60,15 @@ public class GameManager {
         players.add(player); // Dodanie gracza do listy
         addObserver(player); // Dodanie gracza jako obserwatora
         notifyObservers("Player joined. Total players: " + players.size());
+
+        if (players.size() == 2) {
+            player.sendMessage("Do you want to switch to Yin and Yang variant? (yes)");
+        }
+
+        if (players.size() == 3 && !yinAndYangManager.isYinAndYangEnabled()) {
+            notifyObservers("Yin and Yang is no longer available due to too many players (2 required).");
+        }
+
         return true;
     }
 
@@ -55,7 +81,13 @@ public class GameManager {
         }
         String[] elementsOfCommand = command.split(" "); // Podział komendy na elementy
 
-        if(command.equals("join")) {
+        if (command.equalsIgnoreCase("yes")) {
+            if (players.size() == 2 && !gameStarted) {
+                yinAndYangManager.enableYinAndYang();
+            } else {
+                player.sendMessage("Cannot enable Yin and Yang. Ensure there are exactly 2 players and the game hasn't started.");
+            }
+        } else if(command.equals("join")) {
             addPlayer(player);
         } else if (command.equals("game start")) {
             startGame(player);
@@ -65,8 +97,6 @@ public class GameManager {
             processMove(player, command);
         } else if (command.equals("skip")) {
             skipTurn(player);
-        } else {
-            player.sendMessage("Invalid command: " + command);
         }
     }
 
@@ -87,18 +117,16 @@ public class GameManager {
         gameStarted = true; // Ustawienie flagi rozpoczęcia gry
         notifyObservers("Game started with " + players.size() + " players on the chosen board!");
 
-        // Jak już mamy wybraną planszę to definiujemy, która pola są na przeciwko, bo tam będą zmierzać pionki
         DestinationHome destinationHome = new DestinationHome();
         destinationHome.attachDestinationHomes();
 
-        // Jak już mamy określoną liczbę graczy to wypałniamy odpowiednio pionami konkretne domki
-        FillWIthPieces fillWIthPieces = new FillWIthPieces(players.size());
+        if (yinAndYangManager.isYinAndYangEnabled()) {
+            FillWithPiecesYinAndYang filler = new FillWithPiecesYinAndYang(destinationHome);
+            yinAndYangManager.notifyPlayersAboutHomesAndColors(filler.getPieceToHomeMapping(), destinationHome);
+        }
 
-        // Zaincjalizowanie VictoryManager i przekazanie do niego mapy z kolorami pionków i docelowymi polami
         victoryManager = new VictoryManager(destinationHome.getDestinationHomesMap(), players.size());
-
-        // Zainicjalowanie RulesManager i rozpoczęcie gry
-        rulesManager = new RulesManager(players);
+        rulesManager = new RulesManager(players, this);
         rulesManager.startGame();
 
         // Przekazanie instancji planszy do GUI
@@ -106,6 +134,7 @@ public class GameManager {
         System.out.println("Starting GUI...");
         new Thread(() -> {
             GUI.setBoard(currentBoard); // Przekazanie planszy
+            GUI.setGameManager(this);
             Application.launch(GUI.class); // Uruchomienie GUI
         }).start();
 
