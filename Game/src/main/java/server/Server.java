@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Server {
     private static final int MAX_CLIENTS = 6; // Maksymalna liczba klientów
     private static final AtomicInteger connectedClients = new AtomicInteger(0); // Licznik klientów
-    private static final GameManager gameManager = new GameManager(); // Brak początkowej planszy na start
+    private static final GameManager gameManager = GameManager.getInstance();            // Brak początkowej planszy na start
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(4444)) {

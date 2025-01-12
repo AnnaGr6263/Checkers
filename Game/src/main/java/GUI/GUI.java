@@ -94,7 +94,7 @@ public class GUI extends Application {
         }
 
         // Przekazanie ruchu do GameManager
-        GameManager.getInstance().processMoveFromGUI(move);
+        //GameManager.getInstance().processMoveFromGUI(move);
     }
 
     // Odświeżanie GUI
@@ -192,6 +192,7 @@ public class GUI extends Application {
             if (piece != null) {
                 // Rysuj pionek jako koło
                 Circle pieceCircle = new Circle(x, y, CELL_SIZE / 3.0);
+                //pieceCircle.setOnMouseClicked(mouseEvent -> handleFieldClick(mouseEvent, pieceCircle));
                 pieceCircle.setFill(getColorForPiece(piece)); // Kolor pionka
                 root.getChildren().add(pieceCircle);
             } else if (field.getHome() != HomeColor.NONE) {

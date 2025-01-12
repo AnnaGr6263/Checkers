@@ -9,17 +9,26 @@ import java.util.List;
 
 public class GameManager {
 
-    private static GameManager gameManagerInstance;             // Jedyna instancja klasy GameManager
+    private static  volatile GameManager gameManagerInstance;   // Jedyna instancja klasy GameManager
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
     private final List<Mediator> players = new ArrayList<>();   // Lista graczy
     private boolean gameStarted = false;
     private RulesManager rulesManager; // Zarządca zasad gry
 
-    public static synchronized GameManager getInstance() {
-        if (gameManagerInstance == null) {
-            throw new IllegalStateException("GameManager instance has not been initialized yet!");
+    private GameManager(){}            // Prywatny konstruktor
+
+    public static GameManager getInstance() {
+        // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
+        GameManager gameManager = gameManagerInstance;
+        if(gameManager != null) {
+            return gameManager;
         }
-        return gameManagerInstance;
+        synchronized (GameManager.class) {
+            if(gameManagerInstance == null) {
+                gameManagerInstance = new GameManager();
+            }
+            return gameManagerInstance;
+        }
     }
 
     // Dodanie obserwatora
@@ -175,14 +184,18 @@ public class GameManager {
 
     public void processMoveFromClick(Field selectedStartField, Field selectedEndField) {
         Mediator currentPlayer = rulesManager.getCurrentPlayer();
-        if (!rulesManager.canPlayerMove(currentPlayer, selectedStartField)) {
-            return; // Gracz nie ma prawa wykonać ruchu
-        }
+        /*if (!rulesManager.canPlayerMove(currentPlayer, selectedStartField)) {
+            return; // Gracz nie ma prawa wykonać ruchu.
+        }*/
 
         System.out.println("wchodzi do process move w move manager");
         MovesManager movesManager = new MovesManager(this, selectedStartField, selectedEndField);
-        movesManager.performMove();
-        rulesManager.nextPlayer();
+        if(movesManager.isValidMove()) {
+            movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
+            rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+        } else {
+            currentPlayer.sendMessage("Invalid move.");
+        }
     }
 
     public void processMoveFromGUI(String move) {
