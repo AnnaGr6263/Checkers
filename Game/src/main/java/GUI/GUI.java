@@ -127,7 +127,7 @@ public class GUI extends Application {
             double y = OFFSET_Y + (row - 8) * (CELL_SIZE * 0.866);
 
             Circle circle = new Circle(x, y, CELL_SIZE / 2.5); // Pole jako koło
-            circle.setOnMouseClicked(mouseEvent -> handleFieldClick(mouseEvent, field));
+            circle.setOnMouseClicked(mouseEvent -> handleFieldClick(mouseEvent, field, circle));
             circle.setStroke(Color.BLACK); // Obrys koła
             circle.setStrokeWidth(1.5); // Grubość obrysu
 
@@ -159,21 +159,21 @@ public class GUI extends Application {
             if (piece != null) {
                 // Rysuj pionek jako koło
                 Circle pieceCircle = new Circle(x, y, CELL_SIZE / 2.5);
-                pieceCircle.setOnMouseClicked(event -> handleFieldClick(event, field));
+                pieceCircle.setOnMouseClicked(event -> handleFieldClick(event, field, pieceCircle));
                 pieceCircle.setFill(getColorForPiece(piece)); // Kolor pionka
                 root.getChildren().add(pieceCircle);
             } else if (field.getHome() != HomeColor.NONE) {
                 // Rysuj pole domku bez pionka
                 Circle transparentCircle = new Circle(x, y, CELL_SIZE / 2.5);
-                transparentCircle.setOnMouseClicked(ev -> handleFieldClick(ev, field));
+                transparentCircle.setOnMouseClicked(ev -> handleFieldClick(ev, field, transparentCircle));
                 transparentCircle.setStroke(Color.BLACK);
                 transparentCircle.setFill(Color.TRANSPARENT);
                 root.getChildren().add(transparentCircle);
             }
         }
     }
-    private void handleFieldClick(MouseEvent event, Field field) {
-        clickHandler.handle(event, field);
+    private void handleFieldClick(MouseEvent event, Field field, Circle circle) {
+        clickHandler.handle(field, circle);
     }
 
     // Pobierz półprzezroczysty kolor dla domku na podstawie HomeColor
