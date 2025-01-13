@@ -27,12 +27,30 @@ public class RulesManager {
             throw new IllegalStateException("Game has already started.");
         }
 
-        if (!gameManager.getYinAndYangManager().isYinAndYangEnabled()) {
+        if (gameManager.getYinAndYangManager().isYinAndYangEnabled()) {
+            setupYinAndYangAssignments();
+        } else {
             assignHomes(); // Przypisanie domków do graczy tylko w trybie klasycznym
             shufflePlayers(); // Losowe ustawienie kolejności graczy
         }
 
         gameStarted = true;
+    }
+
+    // Przypisz domki do graczy w trybie Yin and Yang
+    private void setupYinAndYangAssignments() {
+        Map<PieceColor, HomeColor> pieceToHomeMapping = gameManager.getYinAndYangManager().getPieceToHomeMapping();
+
+        for (Map.Entry<PieceColor, HomeColor> entry : pieceToHomeMapping.entrySet()) {
+            Mediator player = gameManager.getPlayerByColor(entry.getKey());
+            if (player != null) {
+                homeAssignments.put(entry.getValue(), player);
+            } else {
+                throw new IllegalStateException("Player not found for piece color: " + entry.getKey());
+            }
+        }
+        // Log diagnostyczny
+        System.out.println("Home assignments for Yin and Yang: " + homeAssignments);
     }
 
     // Przypisz domki do graczy w zależności od liczby graczy
@@ -50,6 +68,8 @@ public class RulesManager {
             homeAssignments.put(home, player); // Przypisanie gracza do domku
            player.sendMessage("Your home color: " + home.name());
         }
+        // Log diagnostyczny
+        System.out.println("Home assignments: " + homeAssignments);
     }
 
     // Pobierz zestaw kolorów domków na podstawie liczby graczy
@@ -113,6 +133,11 @@ public class RulesManager {
         PieceColor pieceColor = startField.getPiece().getColor();
         System.out.println("Player: " + player + ", PieceColor: " + pieceColor);
 
+        if (pieceColor == null) {
+            player.sendMessage("Invalid move: The piece has no color.");
+            return false;
+        }
+
         // Sprawdź tryb Yin and Yang
         if (gameManager.getYinAndYangManager().isYinAndYangEnabled()) {
             return playerOwnsPieceInYinAndYang(player, pieceColor);
@@ -149,12 +174,30 @@ public class RulesManager {
 
     // Pobierz kolor gracza na podstawie przypisanego domku
     public PieceColor getPlayerColor(Mediator player) {
+        HomeColor playerHome = null;
+
+        // Znajdź HomeColor przypisany do gracza
         for (Map.Entry<HomeColor, Mediator> entry : homeAssignments.entrySet()) {
             if (entry.getValue().equals(player)) {
-                return mapHomeColorToPieceColor(entry.getKey());  // Zwraca kolor gracza
+                playerHome = entry.getKey();
+                break;
             }
         }
-        return null;
+
+        if (playerHome == null) {
+            throw new IllegalStateException("Player home not found for player: " + player);
+        }
+
+        if (gameManager.getYinAndYangManager().isYinAndYangEnabled()) {
+            for (Map.Entry<PieceColor, HomeColor> entry : gameManager.getYinAndYangManager().getPieceToHomeMapping().entrySet()) {
+                if (entry.getValue().equals(playerHome)) {
+                    return entry.getKey();
+                }
+            }
+            return null;
+        } else {
+            return mapHomeColorToPieceColor(playerHome);
+        }
     }
     public Mediator getPlayerByColor(PieceColor pieceColor) {
         // Iterujemy po przypisaniach HomeColor do Mediator

@@ -12,6 +12,7 @@ import java.util.Map;
 public class YinAndYangManager {
     private final GameManager gameManager = GameManager.getInstance();
     private boolean isYinAndYangEnabled = false;
+    private Map<PieceColor, HomeColor> pieceToHomeMapping;
 
     public YinAndYangManager( ) {
     }
@@ -42,6 +43,8 @@ public class YinAndYangManager {
     }
 
     public void notifyPlayersAboutHomesAndColors(Map<PieceColor, HomeColor> pieceToHome, DestinationHomeYinAndYang destinationHome) {
+        this.pieceToHomeMapping = pieceToHome;
+
         gameManager.getPlayers().get(0).sendMessage("Your color is BLACK.");
         gameManager.getPlayers().get(0).sendMessage("Your home color: " + pieceToHome.get(PieceColor.BLACK_PIECE).name());
         gameManager.getPlayers().get(0).sendMessage("Your destination home: " + getDestinationFieldsDescription(destinationHome.getDestinationHomesMap().get(PieceColor.BLACK_PIECE)));
@@ -49,6 +52,14 @@ public class YinAndYangManager {
         gameManager.getPlayers().get(1).sendMessage("Your color is YELLOW.");
         gameManager.getPlayers().get(1).sendMessage("Your home color: " + pieceToHome.get(PieceColor.YELLOW_PIECE).name());
         gameManager.getPlayers().get(1).sendMessage("Your destination home: " + getDestinationFieldsDescription(destinationHome.getDestinationHomesMap().get(PieceColor.YELLOW_PIECE)));
+
+        // Log diagnostyczny
+        System.out.println("Piece to home mapping: " + pieceToHome);
+        System.out.println("Destination homes: " + destinationHome.getDestinationHomesMap());
+    }
+
+    public Map<PieceColor, HomeColor> getPieceToHomeMapping() {
+        return pieceToHomeMapping;
     }
 
     // Pomocnicza metoda do opisania pól domków docelowych -- do wywalenia potem
