@@ -1,6 +1,7 @@
 package server.manager;
 import board.*;
 import board.enums.PieceColor;
+import board.fill.FillWIthPieces;
 import board.fill.FillWithPiecesYinAndYang;
 import board.homes.DestinationHome;
 import board.homes.DestinationHomeYinAndYang;
@@ -148,12 +149,11 @@ public class GameManager {
             DestinationHomeYinAndYang destinationHome = new DestinationHomeYinAndYang();
             FillWithPiecesYinAndYang filler = new FillWithPiecesYinAndYang(destinationHome);
             yinAndYangManager.notifyPlayersAboutHomesAndColors(filler.getPieceToHomeMapping(), destinationHome);
-
             victoryManager = new VictoryManager(destinationHome.getDestinationHomesMap(), players.size());
         } else {
             DestinationHome destinationHome = new DestinationHome();
             destinationHome.attachDestinationHomes();
-
+            FillWIthPieces fillWIthPieces = new FillWIthPieces(players.size());
             victoryManager = new VictoryManager(destinationHome.getDestinationHomesMap(), players.size());
         }
 
