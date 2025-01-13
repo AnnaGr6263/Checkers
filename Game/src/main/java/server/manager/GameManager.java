@@ -1,6 +1,7 @@
 package server.manager;
 import board.*;
 import board.enums.PieceColor;
+import board.fill.FillWIthPieces;
 import board.fill.FillWithPiecesYinAndYang;
 import board.homes.DestinationHome;
 import board.homes.DestinationHomeYinAndYang;
