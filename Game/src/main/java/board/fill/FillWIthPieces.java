@@ -1,4 +1,6 @@
-package board;
+package board.fill;
+import board.Field;
+import board.Piece;
 import board.enums.HomeColor;
 import board.enums.PieceColor;
 import server.ChooseBoard;

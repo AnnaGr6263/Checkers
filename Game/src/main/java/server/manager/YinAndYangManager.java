@@ -1,19 +1,19 @@
-package server;
+package server.manager;
 
-import board.DestinationHome;
 import board.Field;
 import board.enums.HomeColor;
 import board.enums.PieceColor;
+import board.homes.DestinationHomeYinAndYang;
+import server.Mediator;
 
 import java.util.List;
 import java.util.Map;
 
 public class YinAndYangManager {
-    private final GameManager gameManager;
+    private final GameManager gameManager = GameManager.getInstance();
     private boolean isYinAndYangEnabled = false;
 
-    public YinAndYangManager(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public YinAndYangManager( ) {
     }
 
     public boolean enableYinAndYang() {
@@ -26,7 +26,13 @@ public class YinAndYangManager {
             return false;
         }
 
-        isYinAndYangEnabled = true;
+        Mediator blackPlayer = gameManager.getPlayers().get(0);
+        Mediator yellowPlayer = gameManager.getPlayers().get(1);
+
+        System.out.println("Black Player assigned to BLACK_PIECE: " + blackPlayer);
+        System.out.println("Yellow Player assigned to YELLOW_PIECE: " + yellowPlayer);
+
+        isYinAndYangEnabled = true; // Aktywacja Yin and Yang
         gameManager.notifyObservers("Yin and Yang variant activated. Special rules will take effect on game start!");
         return true;
     }
@@ -35,16 +41,12 @@ public class YinAndYangManager {
         return isYinAndYangEnabled;
     }
 
-    public void notifyPlayersAboutHomesAndColors(Map<PieceColor, HomeColor> pieceToHome, DestinationHome destinationHome) {
-        // Gracz 1
+    public void notifyPlayersAboutHomesAndColors(Map<PieceColor, HomeColor> pieceToHome, DestinationHomeYinAndYang destinationHome) {
         gameManager.getPlayers().get(0).sendMessage("Your color is BLACK.");
-        //dupa print do wywalenia
         gameManager.getPlayers().get(0).sendMessage("Your home color: " + pieceToHome.get(PieceColor.BLACK_PIECE).name());
         gameManager.getPlayers().get(0).sendMessage("Your destination home: " + getDestinationFieldsDescription(destinationHome.getDestinationHomesMap().get(PieceColor.BLACK_PIECE)));
 
-        // Gracz 2
         gameManager.getPlayers().get(1).sendMessage("Your color is YELLOW.");
-        //dupa print do wywalenia
         gameManager.getPlayers().get(1).sendMessage("Your home color: " + pieceToHome.get(PieceColor.YELLOW_PIECE).name());
         gameManager.getPlayers().get(1).sendMessage("Your destination home: " + getDestinationFieldsDescription(destinationHome.getDestinationHomesMap().get(PieceColor.YELLOW_PIECE)));
     }

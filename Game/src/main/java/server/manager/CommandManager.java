@@ -1,6 +1,8 @@
-package server;
+package server.manager;
 
 import board.Field;
+import server.ChooseBoard;
+import server.Mediator;
 
 /**
  * Klasa odpowiedzialna za przetwarzanie komendy o schemacie: move [0-16]x[0-24]->[0-16]x[0-24]
