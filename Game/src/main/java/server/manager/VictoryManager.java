@@ -18,6 +18,11 @@ public class VictoryManager {
     }
 
     public boolean checkVictory(PieceColor pieceColor) {
+
+        if (pieceColor == null) {
+            throw new IllegalArgumentException("Piece color is null. Cannot check victory.");
+        }
+
         List<Field> destinationFields = destinationHomesMap.get(pieceColor);    // Pobieramy listę pól, na które musi dostać się pionek
         if (destinationFields == null || destinationFields.isEmpty()) {
             System.out.println("Error: No destination fields defined for color: " + pieceColor);

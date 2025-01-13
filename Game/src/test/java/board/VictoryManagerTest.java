@@ -3,7 +3,7 @@ package board;
 import board.enums.PieceColor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.VictoryManager;
+import server.manager.VictoryManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;

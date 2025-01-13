@@ -23,9 +23,18 @@ public class DestinationHomeYinAndYang implements DestinationHomeInterface {
     }
 
     public void attachDestinationHomes(HomeColor startHome1, HomeColor startHome2) {
-        // Ustawianie domków docelowych dla czarnych i żółtych pionków
-        destinationHomesMap.put(PieceColor.BLACK_PIECE, getList(startHome1.getOpposite()));
-        destinationHomesMap.put(PieceColor.YELLOW_PIECE, getList(startHome2.getOpposite()));
+        List<Field> blackDestination = getList(startHome1.getOpposite());
+        List<Field> yellowDestination = getList(startHome2.getOpposite());
+
+        if (blackDestination == null || blackDestination.isEmpty()) {
+            throw new IllegalStateException("Destination fields for BLACK_PIECE are not properly initialized.");
+        }
+        if (yellowDestination == null || yellowDestination.isEmpty()) {
+            throw new IllegalStateException("Destination fields for YELLOW_PIECE are not properly initialized.");
+        }
+
+        destinationHomesMap.put(PieceColor.BLACK_PIECE, blackDestination);
+        destinationHomesMap.put(PieceColor.YELLOW_PIECE, yellowDestination);
     }
 
     private List<Field> getList(HomeColor homeColor) {

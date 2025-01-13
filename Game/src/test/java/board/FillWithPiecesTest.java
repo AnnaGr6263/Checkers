@@ -2,6 +2,7 @@ package board;
 
 import board.enums.HomeColor;
 import board.enums.PieceColor;
+import board.fill.FillWIthPieces;
 import board.mocks.MockBoardSetup;
 import org.junit.jupiter.api.Test;
 import server.ChooseBoard;

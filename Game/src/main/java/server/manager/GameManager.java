@@ -219,6 +219,9 @@ public class GameManager {
 
             // Sprawdzenie wygranej
             if (victoryManager.checkVictory(rulesManager.getPlayerColor(player))) {
+
+                System.out.println("Checking victory for pieceColor: " + rulesManager.getPlayerColor(player));
+
                 notifyObservers("Player with color " + rulesManager.getPlayerColor(player) + " takes " + victoryManager.whichPlace() +" place.");
                 if(victoryManager.isEnd()) {
                     notifyObservers("End of the game.");
