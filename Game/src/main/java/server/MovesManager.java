@@ -97,6 +97,12 @@ public class MovesManager {
 
     }
 
+    /**
+     * Metoda najszybciej sprawdzająca poprawność ruchu.
+     * Nie można go wykonać gdy: na polu startowym nie ma pionka lub pole końcowe jest zajęte
+     *
+     * @return Prawdę lub fałsz.
+     */
     public boolean firstCheck() {
         // Jeśli na polu startowym nie ma pionka albo na polu końcowym jest pionek to ruch nie jest możliwy
         if(!startField.hasPiece() || endField.hasPiece())
