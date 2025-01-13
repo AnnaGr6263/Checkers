@@ -74,6 +74,11 @@ public class MovesManager {
 
     }
 
+    public boolean firstCheck() {// Jeśli na polu startowym nie ma pionka albo na polu końcowym jest pionek to ruch nie jest możliwy
+        if(!startField.hasPiece() || endField.hasPiece())
+            return false;
+        return true;}
+
     // Sprawdza czy można wykonać taki ruch
     public boolean isValidMove() {
 

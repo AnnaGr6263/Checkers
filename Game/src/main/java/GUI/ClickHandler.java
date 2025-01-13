@@ -1,14 +1,10 @@
 package GUI;
 
 import board.Field;
-import board.enums.PieceColor;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import server.GameManager;
-import server.Mediator;
-import server.MovesManager;
-import server.RulesManager;
+import server.manager.GameManager;
+
 
 public class ClickHandler {
     private Field selectedStartField; // Wybrane pole początkowe
