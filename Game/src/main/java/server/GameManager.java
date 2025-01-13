@@ -2,6 +2,7 @@ package server;
 import board.BoardSetup;
 import board.Field;
 import board.FillWIthPieces;
+import board.enums.PieceColor;
 import javafx.application.Application;
 import GUI.GUI;
 import java.util.ArrayList;
@@ -152,7 +153,7 @@ public class GameManager {
             return; // Gracz nie ma prawa wykonać ruchu
         }
 
-        MovesManager movesManager = new MovesManager(this, startField, endField);
+        MovesManager movesManager = new MovesManager(startField, endField);
         if(movesManager.isValidMove()) {
             movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
             rulesManager.nextPlayer();          // Przejście do kolejnego gracza
@@ -173,52 +174,34 @@ public class GameManager {
         }
 
         // Pobierz kolor gracza, który rezygnuje
-        String playerColor = rulesManager.getPlayerColor(player);
+        PieceColor playerColor = rulesManager.getPlayerColor(player);
 
         // Powiadom wszystkich graczy o rezygnacji z ruchu
-        notifyObservers(String.format("Turn skipped by %s", playerColor));
+        notifyObservers(String.format("Turn skipped by %s", playerColor.name()));
 
         // Przejdź do następnego gracza
         rulesManager.nextPlayer();
     }
 
     public void processMoveFromClick(Field selectedStartField, Field selectedEndField) {
-        Mediator currentPlayer = rulesManager.getCurrentPlayer();
-        /*if (!rulesManager.canPlayerMove(currentPlayer, selectedStartField)) {
-            return; // Gracz nie ma prawa wykonać ruchu.
-        }*/
 
-        System.out.println("wchodzi do process move w move manager");
-        MovesManager movesManager = new MovesManager(this, selectedStartField, selectedEndField);
-        if(movesManager.isValidMove()) {
-            movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
-            rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+        MovesManager movesManager = new MovesManager(selectedStartField, selectedEndField);
+        if(movesManager.firstCheck()) {
+            PieceColor pieceColor = selectedStartField.getPiece().getColor();
+            Mediator currentPlayer = rulesManager.getPlayerByColor(pieceColor);
+
+            if (!rulesManager.canPlayerMove(currentPlayer, selectedStartField)) {
+                return;         // Gracz nie ma prawa wykonać ruchu.
+            }
+
+            if(movesManager.isValidMove()) {
+                movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
+                rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+            } else {
+                currentPlayer.sendMessage("Invalid move.");
+            }
         } else {
-            currentPlayer.sendMessage("Invalid move.");
+            System.out.println("Invalid move.");
         }
-    }
-
-    public void processMoveFromGUI(String move) {
-        System.out.println("wchodzi w metode process od GUI");
-        if (!gameStarted) {
-            System.out.println("Game has not started yet.");
-            return;
-        }
-        Mediator player = rulesManager.getCurrentPlayer();
-        CommandManager commandManager = new CommandManager(player, move);
-
-        if (!commandManager.isMoveIntoStar()) {
-            return; // Nieprawidłowa komenda lub pola są poza gwiazdą
-        }
-        Field startField = commandManager.getStartField();
-        Field endField = commandManager.getEndField();
-
-        if (!rulesManager.canPlayerMove(player, startField)) {
-            return; // Gracz nie ma prawa wykonać ruchu
-        }
-
-        MovesManager movesManager = new MovesManager(this, startField, endField);
-        movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
-        rulesManager.nextPlayer();          // Przejście do kolejnego gracza
     }
 }

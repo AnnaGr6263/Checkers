@@ -7,10 +7,7 @@ import board.enums.HomeColor;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -19,18 +16,17 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import javafx.scene.input.MouseEvent;
-import server.GameManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GUI extends Application {
 
-    private static GUI guiInstance; // Singleton - jedyna instancja klasy GUI
+    private static GUI guiInstance;              // Singleton - jedyna instancja klasy GUI
     private static BoardSetup boardToInitialize; // Plansza przekazywana do GUI przed uruchomieniem
-    private Pane root; // Główny kontener GUI
-    private BoardSetup board; // Obiekt planszy
-    private ClickHandler clickHandler = new ClickHandler();
-
-    private TextField moveInput; // Pole tekstowe do wprowadzania ruchów
-    private Button submitButton; // Przycisk do zatwierdzania ruchów
+    private Pane root;                           // Główny kontener GUI
+    private BoardSetup board;                    // Obiekt planszy
+    private ClickHandler clickHandler = new ClickHandler(); // Obiekt do obsługi kliknięć
 
     // Ustawienie planszy do wykorzystania przez GUI
     public static void setBoard(BoardSetup board) {
@@ -60,12 +56,6 @@ public class GUI extends Application {
         drawFields(); // Rysowanie pól planszy
         drawPieces(); // Rysowanie pionków
 
-        // Dodaj interfejs do wprowadzania ruchów
-        VBox controls = createControls();
-        controls.setLayoutX(10);
-        controls.setLayoutY(10);
-        root.getChildren().add(controls);
-
         // Konfiguracja sceny
         Scene scene = new Scene(root, 800, 600, Color.WHITE);
         primaryStage.setTitle("Chinese Checkers Board"); // Tytuł okna
@@ -73,29 +63,6 @@ public class GUI extends Application {
         primaryStage.show(); // Wyświetlenie okna
     }
 
-    // Tworzy interfejs do wprowadzania ruchów
-    private VBox createControls() {
-        moveInput = new TextField();
-        moveInput.setPromptText("Enter move [0-16]x[0-24]->[0-16]x[0-24])");
-
-        submitButton = new Button("Submit Move");
-        submitButton.setOnAction(event -> handleMoveInput());
-
-        VBox vbox = new VBox(10, moveInput, submitButton);
-        return vbox;
-    }
-
-    // Obsługa wprowadzonego ruchu
-    private void handleMoveInput() {
-        String move = moveInput.getText();
-        if (move == null || move.isEmpty()) {
-            System.out.println("Move input is empty.");
-            return;
-        }
-
-        // Przekazanie ruchu do GameManager
-        //GameManager.getInstance().processMoveFromGUI(move);
-    }
 
     // Odświeżanie GUI
     public void refresh() {
@@ -191,13 +158,14 @@ public class GUI extends Application {
 
             if (piece != null) {
                 // Rysuj pionek jako koło
-                Circle pieceCircle = new Circle(x, y, CELL_SIZE / 3.0);
-                //pieceCircle.setOnMouseClicked(mouseEvent -> handleFieldClick(mouseEvent, pieceCircle));
+                Circle pieceCircle = new Circle(x, y, CELL_SIZE / 2.5);
+                pieceCircle.setOnMouseClicked(event -> handleFieldClick(event, field));
                 pieceCircle.setFill(getColorForPiece(piece)); // Kolor pionka
                 root.getChildren().add(pieceCircle);
             } else if (field.getHome() != HomeColor.NONE) {
                 // Rysuj pole domku bez pionka
                 Circle transparentCircle = new Circle(x, y, CELL_SIZE / 2.5);
+                transparentCircle.setOnMouseClicked(ev -> handleFieldClick(ev, field));
                 transparentCircle.setStroke(Color.BLACK);
                 transparentCircle.setFill(Color.TRANSPARENT);
                 root.getChildren().add(transparentCircle);

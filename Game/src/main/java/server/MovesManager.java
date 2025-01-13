@@ -11,11 +11,8 @@ public class MovesManager {
     private Field startField = null;
     private Field endField = null;
     private GUIMoves guiMoves;
-    private GameManager gameManager;
 
-    public MovesManager(GameManager gameManager, Field startField, Field endField) {
-        this.gameManager = gameManager;
-
+    public MovesManager(Field startField, Field endField) {
         this.startField = startField;
         this.endField = endField;
 
@@ -74,11 +71,18 @@ public class MovesManager {
 
     }
 
+    public boolean firstCheck() {
+        // Jeśli na polu startowym nie ma pionka albo na polu końcowym jest pionek to ruch nie jest możliwy
+        if(!startField.hasPiece() || endField.hasPiece())
+            return false;
+        return true;
+    }
+
     // Sprawdza czy można wykonać taki ruch
     public boolean isValidMove() {
 
         // Na samym początku sprawdzenie ruchu prostego (na sąsiednie pole)
-        if (startField.getNeighbours().contains(endField) && !endField.hasPiece() && startField.hasPiece()) {
+        if (startField.getNeighbours().contains(endField)) {
             return true;
 
         // Następnie sprawdzenie ruchu skoku nad pionkiem (na razie nad jednym pionkiem)
@@ -92,19 +96,18 @@ public class MovesManager {
         }
     }
     public void performMove() {
-        if (isValidMove()) {
-            // Przenieś pionek
-            Piece piece = startField.getPiece(); // Pobierz pionek z pola początkowego
 
-            // Wyślij powiadomienie do wszystkich graczy
-            String message = String.format("Move performed by %s: %dx%d -> %dx%d",
-                    piece.getColor(), // Kolor pionka wykonującego ruch
-                    startField.getRow(), startField.getCol(),
-                    endField.getRow(), endField.getCol());
-            gameManager.notifyObservers(message); // Wywołanie notifyObservers
+        Piece piece = startField.getPiece(); // Pobierz pionek z pola początkowego
 
-            // Zaktualizuj GUI
-            guiMoves.updateMove(startField, endField);
-        }
+        // Wyślij powiadomienie do wszystkich graczy
+        String message = String.format("Move performed by %s: %dx%d -> %dx%d",
+                piece.getColor(), // Kolor pionka wykonującego ruch
+                startField.getRow(), startField.getCol(),
+                endField.getRow(), endField.getCol());
+        GameManager.getInstance().notifyObservers(message); // Wywołanie notifyObservers
+
+        // Zaktualizuj GUI
+        guiMoves.updateMove(startField, endField);
+
     }
 }

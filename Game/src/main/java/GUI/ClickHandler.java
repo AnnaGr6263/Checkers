@@ -1,24 +1,27 @@
 package GUI;
 
 import board.Field;
+import board.enums.PieceColor;
 import javafx.scene.input.MouseEvent;
 import server.GameManager;
+import server.Mediator;
 import server.MovesManager;
+import server.RulesManager;
 
 public class ClickHandler {
     private Field selectedStartField; // Wybrane pole początkowe
     private Field selectedEndField; // Wybrane pole końcowe
+    private PieceColor pieceColor;  // Kolor klikniętego pionka na polu początkowym
 
     public ClickHandler() {}
 
     public void handle(MouseEvent event, Field clickedField) {
+
         if (selectedStartField == null) {
             selectedStartField = clickedField;
-            System.out.println("Selected start field: " + selectedStartField);
         } else {
             selectedEndField = clickedField;
 
-            System.out.println("tu jestem");
             GameManager.getInstance().processMoveFromClick(selectedStartField, selectedEndField);
 
             selectedStartField = null;
