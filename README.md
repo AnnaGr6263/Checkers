@@ -16,15 +16,17 @@ Algorithmic Computer Science at Wroclaw University of Science and Technology.
 1. The system is based on a **client-server architecture**.
 2. Players can connect to the server using a client application and join the game.
 3. The system enforces the rules regarding the number of players (2, 3, 4, or 6 players).
-4. Clients can send moves to other players via the server. The user interface is **console-based**, and moves are inputted as the starting and ending positions (Pattern: `move [0,16]x[0,24]->[0,16]x[0,24]`). 
-5.  Verify whether the player's move is within the bounds of the board.
+4. Clients can send moves to other players via the server. The user interface is **console-based**, 
+    and moves are inputted as the starting and ending positions (Pattern: `move [0,16]x[0,24]->[0,16]x[0,24]`).
+5. Verify whether the player's move is within the bounds of the board.
 ---
 ## Functional Requirements for 2nd Iteration
 1. The gameplay logic was implemented, including at least two different **variants** for players (Classic Chineese Checkers and Yin And Yang variant).
 2. A **graphical user interface (GUI)** for clients was developed using JavaFX.
-3. Code correctness is continuously verified with **unit tests** written using JUnit.
-4. A **class diagram** to illustrate the application's function
-5. **Documentation** was generated using JavaDoc.
+3. Moves can be made by pressing the start field and then the end field (GUI).
+4. Code correctness is continuously verified with **unit tests** written using JUnit.
+5. A **class diagram** to illustrate the application's function
+6. **Documentation** was generated using JavaDoc.
 ---
 ## How to run it:
 ### Clone the repository, and run the following commands in your terminal:
