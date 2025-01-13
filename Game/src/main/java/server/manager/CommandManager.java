@@ -1,6 +1,8 @@
-package server;
+package server.manager;
 
 import board.Field;
+import server.ChooseBoard;
+import server.Mediator;
 
 public class CommandManager {
 

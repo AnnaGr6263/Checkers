@@ -1,22 +1,52 @@
-package server;
+package server.manager;
 import board.*;
-import board.enums.HomeColor;
 import board.enums.PieceColor;
+import board.fill.FillWithPiecesYinAndYang;
+import board.homes.DestinationHome;
+import board.homes.DestinationHomeYinAndYang;
 import javafx.application.Application;
 import GUI.GUI;
+import server.ChooseBoard;
+import server.Mediator;
+import server.Observer;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class GameManager {
 
+    private static  volatile GameManager gameManagerInstance;   // Jedyna instancja klasy GameManager
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
     private final List<Mediator> players = new ArrayList<>();   // Lista graczy
     private boolean gameStarted = false;
     private boolean gameEnded = false;
     private RulesManager rulesManager;                          // Zarządca zasad gry
     private VictoryManager victoryManager;                      // Zarządca wygranej
-    private final YinAndYangManager yinAndYangManager = new YinAndYangManager(this);
+    private YinAndYangManager yinAndYangManager;
+
+    private GameManager(){ // Prywatny konstruktor
+    }
+
+    public static GameManager getInstance() {
+        // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
+        GameManager gameManager = gameManagerInstance;
+        if(gameManager != null) {
+            return gameManager;
+        }
+        synchronized (GameManager.class) {
+            if(gameManagerInstance == null) {
+                gameManagerInstance = new GameManager();
+            }
+            return gameManagerInstance;
+        }
+    }
+
+    public synchronized YinAndYangManager getYinAndYangManager() {
+        if (yinAndYangManager == null) {
+            yinAndYangManager = new YinAndYangManager();
+        }
+        return yinAndYangManager;
+    }
 
     // Dodanie obserwatora
     public void addObserver(Observer observer) {
@@ -38,10 +68,6 @@ public class GameManager {
         return gameStarted;
     }
 
-    public YinAndYangManager getYinAndYangManager() {
-        return yinAndYangManager;
-    }
-
 
     // Dodanie gracza
     public synchronized boolean addPlayer(Mediator player) {
@@ -49,7 +75,7 @@ public class GameManager {
             player.sendMessage("Game has already started. You cannot join.");
             return false;
         }
-        if (yinAndYangManager.isYinAndYangEnabled() && players.size() >= 2) {
+        if (getYinAndYangManager().isYinAndYangEnabled() && players.size() >= 2) {
             player.sendMessage("Cannot join. Yin and Yang allows only 2 players.");
             return false;
         }
@@ -83,6 +109,7 @@ public class GameManager {
 
         if (command.equalsIgnoreCase("yes")) {
             if (players.size() == 2 && !gameStarted) {
+                getYinAndYangManager();
                 yinAndYangManager.enableYinAndYang();
             } else {
                 player.sendMessage("Cannot enable Yin and Yang. Ensure there are exactly 2 players and the game hasn't started.");
@@ -101,7 +128,7 @@ public class GameManager {
     }
 
     // Rozpoczęcie gry
-    private void startGame(Mediator sender) {
+    public void startGame(Mediator sender) {
         if (gameStarted) {
             sender.sendMessage("Game has already started.");
             return;
@@ -117,16 +144,20 @@ public class GameManager {
         gameStarted = true; // Ustawienie flagi rozpoczęcia gry
         notifyObservers("Game started with " + players.size() + " players on the chosen board!");
 
-        DestinationHome destinationHome = new DestinationHome();
-        destinationHome.attachDestinationHomes();
-
         if (yinAndYangManager.isYinAndYangEnabled()) {
+            DestinationHomeYinAndYang destinationHome = new DestinationHomeYinAndYang();
             FillWithPiecesYinAndYang filler = new FillWithPiecesYinAndYang(destinationHome);
             yinAndYangManager.notifyPlayersAboutHomesAndColors(filler.getPieceToHomeMapping(), destinationHome);
+
+            victoryManager = new VictoryManager(destinationHome.getDestinationHomesMap(), players.size());
+        } else {
+            DestinationHome destinationHome = new DestinationHome();
+            destinationHome.attachDestinationHomes();
+
+            victoryManager = new VictoryManager(destinationHome.getDestinationHomesMap(), players.size());
         }
 
-        victoryManager = new VictoryManager(destinationHome.getDestinationHomesMap(), players.size());
-        rulesManager = new RulesManager(players, this);
+        rulesManager = new RulesManager(players);
         rulesManager.startGame();
 
         // Przekazanie instancji planszy do GUI
@@ -134,7 +165,6 @@ public class GameManager {
         System.out.println("Starting GUI...");
         new Thread(() -> {
             GUI.setBoard(currentBoard); // Przekazanie planszy
-            GUI.setGameManager(this);
             Application.launch(GUI.class); // Uruchomienie GUI
         }).start();
 
@@ -163,6 +193,9 @@ public class GameManager {
 
     // Obsługa ruchu
     private void processMove(Mediator player, String command) {
+        System.out.println("Processing move for player: " + player);
+        System.out.println("Command: " + command);
+
         if (!gameStarted) {
             player.sendMessage("Game has not started yet.");
             return;
@@ -179,7 +212,7 @@ public class GameManager {
             return; // Gracz nie ma prawa wykonać ruchu
         }
 
-        MovesManager movesManager = new MovesManager(this, startField, endField);
+        MovesManager movesManager = new MovesManager(startField, endField);
         if(movesManager.isValidMove()) {
             movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
             rulesManager.nextPlayer();          // Przejście do kolejnego gracza
@@ -216,5 +249,14 @@ public class GameManager {
 
         // Przejdź do następnego gracza
         rulesManager.nextPlayer();
+    }
+
+    public Mediator getPlayerByColor(PieceColor pieceColor) {
+        if (pieceColor == PieceColor.BLACK_PIECE) {
+            return players.get(0); // Zakładamy, że gracz z czarnymi pionkami jest pierwszy na liście
+        } else if (pieceColor == PieceColor.YELLOW_PIECE) {
+            return players.get(1); // Gracz z żółtymi pionkami jest drugi na liście
+        }
+        return null; // Dla innych kolorów
     }
 }

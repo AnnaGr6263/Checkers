@@ -14,7 +14,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import server.GameManager;
+import server.manager.GameManager;
+import server.manager.YinAndYangManager;
 
 public class GUI extends Application {
 
@@ -22,7 +23,7 @@ public class GUI extends Application {
     private static BoardSetup boardToInitialize; // Plansza przekazywana do GUI przed uruchomieniem
     private Pane root; // Główny kontener GUI
     private BoardSetup board; // Obiekt planszy
-    private static GameManager gameManager;
+    private static GameManager gameManager = GameManager.getInstance();
 
     // Ustawienie planszy do wykorzystania przez GUI
     public static void setBoard(BoardSetup board) {
@@ -37,12 +38,13 @@ public class GUI extends Application {
         return guiInstance;
     }
 
-    public static void setGameManager(GameManager manager) {
-        gameManager = manager;
-    }
-
     private boolean isYinAndYangEnabled() {
-        return gameManager != null && gameManager.getYinAndYangManager().isYinAndYangEnabled();
+        if (gameManager == null) {
+            return false; // Jeśli gameManager nie został jeszcze zainicjalizowany, zakładamy brak aktywacji
+        }
+
+        YinAndYangManager yinAndYangManager = gameManager.getYinAndYangManager();
+        return yinAndYangManager != null && yinAndYangManager.isYinAndYangEnabled();
     }
 
 

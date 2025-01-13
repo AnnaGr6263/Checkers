@@ -1,5 +1,6 @@
-package board;
+package board.homes;
 
+import board.Field;
 import board.enums.HomeColor;
 import board.enums.PieceColor;
 import server.ChooseBoard;
@@ -9,13 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DestinationHome {
+public class DestinationHome implements DestinationHomeInterface {
 
     private final Map<PieceColor, List<Field>> destinationHomesMap = new HashMap<>();
 
     public DestinationHome() {
     }
 
+    @Override
     public Map<PieceColor, List<Field>> getDestinationHomesMap() {
         return destinationHomesMap;
     }

@@ -1,6 +1,5 @@
 package server;
-import GUI.GUI;
-import javafx.application.Application;
+import server.manager.GameManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Server {
     private static final int MAX_CLIENTS = 6; // Maksymalna liczba klientów
     private static final AtomicInteger connectedClients = new AtomicInteger(0); // Licznik klientów
-    private static final GameManager gameManager = new GameManager(); // Brak początkowej planszy na start
+    private static final GameManager gameManager = GameManager.getInstance();
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(4444)) {
@@ -29,7 +28,7 @@ public class Server {
                 // Połączenie z nowym klientem
                 connectedClients.incrementAndGet();
                 // Utworzenie nowego mediatora dla klienta
-                Mediator mediator = new Mediator(socket, gameManager);
+                Mediator mediator = new Mediator(socket);
                 System.out.println("New client connected. Total clients: " + connectedClients.get());
             }
         } catch (IOException ex) {

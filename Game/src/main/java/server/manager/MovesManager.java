@@ -1,8 +1,9 @@
-package server;
+package server.manager;
 import GUI.GUI;
 import GUI.GUIMoves;
 import board.Field;
 import board.Piece;
+import server.ChooseBoard;
 
 import java.util.*;
 
@@ -11,10 +12,9 @@ public class MovesManager {
     private Field startField = null;
     private Field endField = null;
     private GUIMoves guiMoves;
-    private GameManager gameManager;
+    private GameManager gameManager = GameManager.getInstance();
 
-    public MovesManager(GameManager gameManager, Field startField, Field endField) {
-        this.gameManager = gameManager;
+    public MovesManager(Field startField, Field endField) {
 
         this.startField = startField;
         this.endField = endField;

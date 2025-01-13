@@ -1,7 +1,8 @@
-package server;
+package server.manager;
 import board.Field;
 import board.enums.HomeColor;
 import board.enums.PieceColor;
+import server.Mediator;
 
 import java.util.*;
 
@@ -11,14 +12,13 @@ public class RulesManager {
     private final Map<HomeColor, Mediator> homeAssignments; // Przypisanie domków do graczy
     private int currentPlayerIndex; // Indeks aktualnego gracza
     private boolean gameStarted; // Flaga informująca o rozpoczęciu gry
-    private final GameManager gameManager;
+    private final GameManager gameManager = GameManager.getInstance(); // Instancja klasy GameManager
 
-    public RulesManager(List<Mediator> players, GameManager gameManager) {
+    public RulesManager(List<Mediator> players) {
         this.players = players;
         this.homeAssignments = new HashMap<>();
         this.currentPlayerIndex = 0; // Start od losowego gracza
         this.gameStarted = false;
-        this.gameManager = gameManager; // Przypisanie GameManager
     }
 
     // Rozpocznij grę i przypisz domki do graczy
@@ -29,9 +29,9 @@ public class RulesManager {
 
         if (!gameManager.getYinAndYangManager().isYinAndYangEnabled()) {
             assignHomes(); // Przypisanie domków do graczy tylko w trybie klasycznym
+            shufflePlayers(); // Losowe ustawienie kolejności graczy
         }
 
-        shufflePlayers(); // Losowe ustawienie kolejności graczy
         gameStarted = true;
     }
 
@@ -76,6 +76,7 @@ public class RulesManager {
 
     // Pobierz gracza, który aktualnie wykonuje ruch
     public Mediator getCurrentPlayer() {
+        System.out.println("Current player index: " + currentPlayerIndex);
         return players.get(currentPlayerIndex);
     }
 
@@ -83,6 +84,7 @@ public class RulesManager {
     public void nextPlayer() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         Mediator currentPlayer = getCurrentPlayer();
+        System.out.println("Next player is: " + currentPlayer);
         currentPlayer.sendMessage("It's your turn!");
     }
 
@@ -108,15 +110,16 @@ public class RulesManager {
             return false;
         }
 
-        // Sprawdź, czy pionek na polu należy do gracza
         PieceColor pieceColor = startField.getPiece().getColor();
+        System.out.println("Player: " + player + ", PieceColor: " + pieceColor);
 
-        if (!playerOwnsPiece(player, pieceColor)) {
-            player.sendMessage("Invalid move: You can only move your own pieces!");
-            return false;
+        // Sprawdź tryb Yin and Yang
+        if (gameManager.getYinAndYangManager().isYinAndYangEnabled()) {
+            return playerOwnsPieceInYinAndYang(player, pieceColor);
         }
 
-        return true; // Ruch jest poprawny
+        // Sprawdź klasyczny tryb gry
+        return playerOwnsPiece(player, pieceColor);
     }
 
     private boolean playerOwnsPiece(Mediator player, PieceColor pieceColor) {
@@ -133,6 +136,15 @@ public class RulesManager {
         if (playerHome == null) return false;
 
         return pieceColor == mapHomeColorToPieceColor(playerHome);
+    }
+
+    private boolean playerOwnsPieceInYinAndYang(Mediator player, PieceColor pieceColor) {
+        Mediator owner = gameManager.getPlayerByColor(pieceColor); // Pobierz gracza, który posiada dany kolor pionka
+        if (owner != null && owner.equals(player)) {
+            return true; // Gracz jest właścicielem pionka
+        }
+        player.sendMessage("Invalid move: You can only move your own pieces in Yin and Yang!");
+        return false;
     }
 
     // Pobierz kolor gracza na podstawie przypisanego domku
