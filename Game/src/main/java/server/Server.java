@@ -7,13 +7,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// Klasa Server: zarządza połączeniami klientów i odpowiada za komunikację między nimi.
-
+/**
+ * Klasa Server: zarządza połączeniami klientów i odpowiada za komunikację między nimi.
+ */
 public class Server {
     private static final int MAX_CLIENTS = 6; // Maksymalna liczba klientów
     private static final AtomicInteger connectedClients = new AtomicInteger(0); // Licznik klientów
     private static final GameManager gameManager = GameManager.getInstance();
 
+    /**
+     * Metoda main.
+     *
+     * @param args Argumenty.
+     */
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(4444)) {
             System.out.println("Server is listening on port 4444");
@@ -36,6 +42,11 @@ public class Server {
         }
     }
 
+    /**
+     * Odrzuca klienta gdy z określonych powodów nie może dołączyć do serwera.
+     *
+     * @param socket Socket.
+     */
     private static void rejectClient(Socket socket) {
         try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) { // Inicjalizacja strumienia wyjściowego
             out.println("Connection rejected: Server is full.");
@@ -50,7 +61,9 @@ public class Server {
         }
     }
 
-    // Metoda wywoływana po rozłączeniu klienta
+    /**
+     * Metoda wywoływana po rozłączeniu klienta.
+     */
     public static void clientDisconnected() {
         connectedClients.decrementAndGet(); // Zmniejszenie licznika klientów
         System.out.println("A client disconnected. Connected clients: " + connectedClients.get());

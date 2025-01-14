@@ -6,6 +6,9 @@ import server.Mediator;
 
 import java.util.*;
 
+/**
+ * Klasa odpowiedzialna za zarządzanie grą w kontekście zasad wykonywania ruchów. Tzn. zarządzanie kolejnością.
+ */
 public class RulesManager {
 
     private final List<Mediator> players; // Lista graczy
@@ -14,6 +17,11 @@ public class RulesManager {
     private boolean gameStarted; // Flaga informująca o rozpoczęciu gry
     private final GameManager gameManager = GameManager.getInstance(); // Instancja klasy GameManager
 
+    /**
+     * Konstruktor.
+     *
+     * @param players Lista zawierająca graczy w grze.
+     */
     public RulesManager(List<Mediator> players) {
         this.players = players;
         this.homeAssignments = new HashMap<>();
@@ -21,7 +29,9 @@ public class RulesManager {
         this.gameStarted = false;
     }
 
-    // Rozpocznij grę i przypisz domki do graczy
+    /**
+     * Rozpoczęcie gry i przypisanie graczom ich domków.
+     */
     public void startGame() {
         if (gameStarted) {
             throw new IllegalStateException("Game has already started.");
@@ -37,7 +47,9 @@ public class RulesManager {
         gameStarted = true;
     }
 
-    // Przypisz domki do graczy w trybie Yin and Yang
+    /**
+     * Przypisuje domki do graczy w trybie Yin and Yang
+     */
     private void setupYinAndYangAssignments() {
         Map<PieceColor, HomeColor> pieceToHomeMapping = gameManager.getYinAndYangManager().getPieceToHomeMapping();
 
@@ -51,7 +63,9 @@ public class RulesManager {
         }
     }
 
-    // Przypisz domki do graczy w zależności od liczby graczy
+    /**
+     * Przypisuje domki do graczy w zależności od liczby graczy
+     */
     private void assignHomes() {
 
         List<HomeColor> availableHomes = getHomesForPlayerCount(players.size());
@@ -68,7 +82,12 @@ public class RulesManager {
         }
     }
 
-    // Pobierz zestaw kolorów domków na podstawie liczby graczy
+    /**
+     * Pobiera zestaw kolorów domków na podstawie liczby graczy.
+     *
+     * @param playerCount liczba graczy.
+     * @return Listę kolorów w grze.
+     */
     private List<HomeColor> getHomesForPlayerCount(int playerCount) {
         switch (playerCount) {
             case 2:
@@ -84,19 +103,27 @@ public class RulesManager {
         }
     }
 
-    // Tasowanie graczy w celu ustalenia losowej kolejności
+    /**
+     * Tasowanie graczy w celu ustalenia losowej kolejności.
+     */
     private void shufflePlayers() {
         Collections.shuffle(players); // Losowe przetasowanie graczy
         currentPlayerIndex = 0; // Ustaw pierwszy gracz na indeks 0
     }
 
-    // Pobierz gracza, który aktualnie wykonuje ruch
+    /**
+     * Pobieranie gracza, który aktualnie wykonuje ruch.
+     *
+     * @return Gracz, który aktualnie wykonuje ruch.
+     */
     public Mediator getCurrentPlayer() {
         System.out.println("Current player index: " + currentPlayerIndex);
         return players.get(currentPlayerIndex);
     }
 
-    // Przejdź do kolejnego gracza w kolejności
+    /**
+     * Przejście do kolejnego gracza.
+     */
     public void nextPlayer() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         Mediator currentPlayer = getCurrentPlayer();
@@ -104,7 +131,13 @@ public class RulesManager {
         currentPlayer.sendMessage("It's your turn!");
     }
 
-    // Sprawdź, czy gracz może wykonać ruch
+    /**
+     * Sprawdza czy gracz może wykonać ruch.
+     *
+     * @param player Gracz wykonujacy ruch.
+     * @param startField Wybrane przez niego pole startowe.
+     * @return Prawdę jeśli gracz może wykonać ruch i fałsz w przeciwnym razie.
+     */
     public boolean canPlayerMove(Mediator player, Field startField) {
         if (!gameStarted) {
             player.sendMessage("Game has not started yet.");
@@ -143,6 +176,13 @@ public class RulesManager {
         return playerOwnsPiece(player, pieceColor);
     }
 
+    /**
+     * Sprawsza czy konretny gracz jest właścicielem pionka o określonym kolorze.
+     *
+     * @param player Gracz.
+     * @param pieceColor Kolor pionka.
+     * @return Prawdę jeśli gracz jest posiadaczem pionków w takim kolorze i fałsz w przeciwnym razie.
+     */
     private boolean playerOwnsPiece(Mediator player, PieceColor pieceColor) {
         HomeColor playerHome = null;
 
@@ -159,6 +199,13 @@ public class RulesManager {
         return pieceColor == mapHomeColorToPieceColor(playerHome);
     }
 
+    /**
+     * Sprawsza czy konretny gracz jest właścicielem pionka o określonym kolorze w wariancie gry YingAndYang.
+     *
+     * @param player Gracz.
+     * @param pieceColor Kolor pionka.
+     * @return Prawdę jeśli gracz jest posiadaczem pionków w takim kolorze i fałsz w przeciwnym razie.
+     */
     private boolean playerOwnsPieceInYinAndYang(Mediator player, PieceColor pieceColor) {
         Mediator owner = gameManager.getPlayerByColor(pieceColor); // Pobierz gracza, który posiada dany kolor pionka
         if (owner != null && owner.equals(player)) {
@@ -168,7 +215,12 @@ public class RulesManager {
         return false;
     }
 
-    // Pobierz kolor gracza na podstawie przypisanego domku
+    /**
+     * Pobierz kolor pionków gracza na podstawie przypisanego domku.
+     *
+     * @param player Gracz.
+     * @return Kolor pionka.
+     */
     public PieceColor getPlayerColor(Mediator player) {
         HomeColor playerHome = null;
 
@@ -195,6 +247,13 @@ public class RulesManager {
             return mapHomeColorToPieceColor(playerHome);
         }
     }
+
+    /**
+     * Pobiera gracza na podstawie używanych przez niego pionków o określonym kolorze.
+     *
+     * @param pieceColor Kolor pionków.
+     * @return Gracza.
+     */
     public Mediator getPlayerByColor(PieceColor pieceColor) {
         // Iterujemy po przypisaniach HomeColor do Mediator
         for (Map.Entry<HomeColor, Mediator> entry : homeAssignments.entrySet()) {
@@ -210,7 +269,14 @@ public class RulesManager {
         // Jeśli nie znaleziono żadnego gracza, zwracamy null
         return null;
     }
-    // Metoda pomocnicza do mapowania HomeColor na PieceColor
+
+    /**
+     * Metoda pomocnicza do mapowania HomeColor na PieceColor.
+     * Przypisuje kolorowi domku odpowiadający mu kolor pionków.
+     *
+     * @param homeColor Kolor domku.
+     * @return Kolor pionków.
+     */
     private PieceColor mapHomeColorToPieceColor(HomeColor homeColor) {
         switch (homeColor) {
             case RED:

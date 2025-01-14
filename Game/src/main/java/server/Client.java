@@ -4,11 +4,17 @@ import java.net.Socket;
 import java.io.*;
 import java.net.UnknownHostException;
 
-// Klasa Client: reprezentuje uczestnika komunikacji w systemie.
-// Uczestnik komunikuje się z serwerem poprzez swojego dedykowanego Mediatora.
-
+/**
+ * Klasa reprezentująca klienta uczestnika komunikacji w systemie.
+ * Uczestnik komunikuje się z serwerem poprzez swojego dedykowanego Mediatora.
+ */
 public class Client {
 
+    /**
+     * Metoda main.
+     *
+     * @param args Argumenty.
+     */
     public static void main(String[] args) {
         try {
             Socket socket = new Socket("localhost", 4444); // Połączenie z serwerem na porcie 4444

@@ -4,14 +4,20 @@ import server.manager.GameManager;
 import java.io.*;
 import java.net.Socket;
 
-// Klasa Mediator: odpowiada za połączenie z jednym klientem.
-// Przesyła wiadomości od klienta do serwera i odwrotnie.
-
+/**
+ * Klasa Mediator: odpowiada za połączenie z jednym klientem.
+ * Przesyła wiadomości od klienta do serwera i odwrotnie.
+ */
 public class Mediator extends Thread implements Observer {
     private final Socket socket; // Połączenie z klientem
     private PrintWriter out; // Strumień wyjściowy do klienta
     private final GameManager gameManager = GameManager.getInstance(); // Menadżer gry
 
+    /**
+     * Konstruktor.
+     *
+     * @param socket Socket.
+     */
     public Mediator(Socket socket) {
         this.socket = socket;
 
@@ -30,9 +36,10 @@ public class Mediator extends Thread implements Observer {
         this.start(); // Uruchomienie wątku
     }
 
-
+    /**
+     * Odbieranie wiadomości od klienta - wątek.
+     */
     @Override
-    // Odbieranie wiadomości od klienta - watek
     public void run() {
         if (socket == null) {
             System.out.println("Socket is null. Cannot start input stream handling.");
@@ -55,17 +62,30 @@ public class Mediator extends Thread implements Observer {
         }
     }
 
+    /**
+     * Metoda update. Odbiera wiadomości od GameManagera.
+     *
+     * @param message Treść wiadomości.
+     */
     @Override
     public void update(String message) {
-        sendMessage(message); // Otrzymywanie powiadomień od GameManager
+        sendMessage(message);
     }
 
+    /**
+     * Wysyłanie wiadomości do klienta.
+     *
+     * @param message Treść wiadomości.
+     */
     public void sendMessage(String message) {
         if (out != null) {
             out.println(message); // Wysyłanie wiadomości do klienta
         }
     }
 
+    /**
+     * Zamknięcie socketa.
+     */
     private void closeSocket() {
         if (socket != null) {
             try {

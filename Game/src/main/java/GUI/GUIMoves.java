@@ -4,11 +4,22 @@ import board.Field;
 import board.Piece;
 import javafx.application.Platform;
 
+/**
+ * Klasa odpowiedzialna za wykonanie ruchu w GUI
+ */
 public class GUIMoves {
 
+    /**
+     * Konstruktor.
+     */
     public GUIMoves() {}
 
-    // Aktualizacja GUI po wykonaniu ruchu
+    /**
+     * Aktualizacja GUI po wykonaniu ruchu.
+     *
+     * @param startField Pole początkowe.
+     * @param endField Pole końcowe.
+     */
     public void updateMove(Field startField, Field endField) {
         if (startField == null || endField == null) {
             System.out.println("Invalid fields for move.");
