@@ -40,7 +40,6 @@ public class VictoryManager {
 
         List<Field> destinationFields = destinationHomesMap.get(pieceColor);    // Pobieramy listę pól, na które musi dostać się pionek
         if (destinationFields == null || destinationFields.isEmpty()) {
-            System.out.println("Error: No destination fields defined for color: " + pieceColor);
             throw new IllegalArgumentException("No destination fields defined for color: " + pieceColor);
         }
 
