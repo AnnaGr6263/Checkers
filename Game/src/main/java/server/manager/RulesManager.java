@@ -49,8 +49,6 @@ public class RulesManager {
                 throw new IllegalStateException("Player not found for piece color: " + entry.getKey());
             }
         }
-        // Log diagnostyczny
-        System.out.println("Home assignments for Yin and Yang: " + homeAssignments);
     }
 
     // Przypisz domki do graczy w zależności od liczby graczy
@@ -68,8 +66,6 @@ public class RulesManager {
             homeAssignments.put(home, player); // Przypisanie gracza do domku
            player.sendMessage("Your home color: " + home.name());
         }
-        // Log diagnostyczny
-        System.out.println("Home assignments: " + homeAssignments);
     }
 
     // Pobierz zestaw kolorów domków na podstawie liczby graczy
