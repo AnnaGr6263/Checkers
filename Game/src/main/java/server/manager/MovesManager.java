@@ -15,13 +15,12 @@ public class MovesManager {
     private Field startField = null;
     private Field endField = null;
     private GUIMoves guiMoves;
-    private GameManager gameManager = GameManager.getInstance();
 
     /**
-     * Konstruktor.
+     * Konstruktor klasy Moves Manager.
      *
-     * @param startField Pole początkowe zaproponowanego przez gracza ruchu.
-     * @param endField Pole końcowe zaproponowanego przez gracza ruchu.
+     * @param startField Pole początkowe
+     * @param endField Pole końcowe zaproponowane przez gracza podczas ruchu.
      */
     public MovesManager(Field startField, Field endField) {
         this.startField = startField;
@@ -33,9 +32,9 @@ public class MovesManager {
     }
 
     /**
-     * Getter.
+     * Getter do pola startowego.
      *
-     * @return Pole początkowe.
+     * @return Pole startowe.
      */
     public Field getStartField() {
         return startField;
@@ -100,8 +99,7 @@ public class MovesManager {
     }
 
     /**
-     * Metoda najszybciej sprawdzająca poprawność ruchu.
-     * Nie można go wykonać gdy: na polu startowym nie ma pionka
+     * Metoda najszybciej sprawdzająca poprawność ruchu. Nie można go wykonać gdy: na polu startowym nie ma pionka
      * lub pole końcowe jest zajęte
      *
      * @return Prawdę lub fałsz.

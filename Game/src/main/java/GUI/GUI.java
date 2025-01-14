@@ -19,9 +19,9 @@ import server.manager.YinAndYangManager;
 
 import javafx.scene.input.MouseEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * Klasa odpowiedzialna za tworzenie i obsługę naszego GUI.
+ */
 public class GUI extends Application {
 
     private static GUI guiInstance;              // Singleton - jedyna instancja klasy GUI
@@ -31,12 +31,20 @@ public class GUI extends Application {
     private ClickHandler clickHandler = new ClickHandler(); // Obiekt do obsługi kliknięć
     private static GameManager gameManager = GameManager.getInstance();
 
-    // Ustawienie planszy do wykorzystania przez GUI
+    /**
+     * Ustawienie planszy do wykorzystania przez GUI
+     *
+     * @param board Wybrana plansza do ustawienia.
+     */
     public static void setBoard(BoardSetup board) {
         boardToInitialize = board; // Przechowaj dowolną instancję klasy BoardSetup
     }
 
-    // Pobranie instancji GUI (Singleton)
+    /**
+     * Pobranie instancji GUI (Singleton)
+     *
+     * @return Jedyną instancję GUI w grze.
+     */
     public static GUI getInstance() {
         if (guiInstance == null) {
             throw new IllegalStateException("GUI instance has not been initialized yet!");
@@ -44,6 +52,11 @@ public class GUI extends Application {
         return guiInstance;
     }
 
+    /**
+     * Metoda do sprawdzenia czy aktywowany został wariant YingAndYang
+     *
+     * @return Prawdę jeśli YingAndYang jest aktywny lub fałsz w przeciwnym wypadku.
+     */
     private boolean isYinAndYangEnabled() {
         if (gameManager == null) {
             return false; // Jeśli gameManager nie został jeszcze zainicjalizowany, zakładamy brak aktywacji
@@ -53,6 +66,11 @@ public class GUI extends Application {
         return yinAndYangManager != null && yinAndYangManager.isYinAndYangEnabled();
     }
 
+    /**
+     * Metoda start
+     *
+     * @param primaryStage scena GUI.
+     */
     @Override
     public void start(Stage primaryStage) {
         guiInstance = this; // Ustawienie instancji Singleton
@@ -75,8 +93,9 @@ public class GUI extends Application {
         primaryStage.show(); // Wyświetlenie okna
     }
 
-
-    // Odświeżanie GUI
+    /**
+     * Odświeżanie GUI
+     */
     public void refresh() {
         System.out.println("Refreshing GUI..."); // Informacja debug
         Platform.runLater(() -> { // Wykonaj w wątku JavaFX
@@ -87,7 +106,9 @@ public class GUI extends Application {
         });
     }
 
-    // Rysowanie siatki planszy
+    /**
+     * Rysowanie siatki planszy
+     */
     private void drawGrid() {
         // Numery kolumn
         for (int col = 0; col < 25; col++) {
@@ -129,7 +150,9 @@ public class GUI extends Application {
         }
     }
 
-    // Rysowanie pól planszy
+    /**
+     * Rysowanie pól planszy
+     */
     private void drawFields() {
         boolean isYinAndYang = isYinAndYangEnabled();
 
@@ -162,7 +185,9 @@ public class GUI extends Application {
         }
     }
 
-    // Rysowanie pionków
+    /**
+     * Rysowanie pionków
+     */
     private void drawPieces() {
         for (Field field : board.getFieldsInsideAStar()) {
             Piece piece = field.getPiece(); // Pobierz pionek na polu
@@ -189,11 +214,26 @@ public class GUI extends Application {
             }
         }
     }
+
+    /**
+     * Metoda wywoływana podczas kliknięcia myszą na pole, pionek, lub pole domku.
+     * W każdym przypadku pobieramy odpowiedni obiekt pola odpowiadający tej akcji oraz koło, które graficznie
+     * je reprezentuje.
+     *
+     * @param event Zdarzenie kliknięcia myszą.
+     * @param field Kliknięte pole
+     * @param circle Element graficzny pola w GUI.
+     */
     private void handleFieldClick(MouseEvent event, Field field, Circle circle) {
         clickHandler.handle(field, circle);
     }
 
-    // Pobierz półprzezroczysty kolor dla domku na podstawie HomeColor
+    /**
+     * Pobiera półprzezroczysty kolor dla domku na podstawie HomeColor.
+     *
+     * @param home Kolor domku.
+     * @return Półprzezroczystą wersję danego koloru.
+     */
     private Color getTransparentColorForHome(HomeColor home) {
         switch (home) {
             case RED:
@@ -213,7 +253,12 @@ public class GUI extends Application {
         }
     }
 
-    // Pobierz kolor dla domku na podstawie HomeColor
+    /**
+     * Pobiera kolor dla domku na podstawie HomeColor.
+     *
+     * @param home Kolor domku.
+     * @return Kolor domku.
+     */
     private Color getColorForHome(HomeColor home) {
         switch (home) {
             case RED:
@@ -233,7 +278,12 @@ public class GUI extends Application {
         }
     }
 
-    // Pobierz kolor dla pionka na podstawie PieceColor
+    /**
+     * Pobiera kolor dla pionka na podstawie koloru pionka.
+     *
+     * @param piece Konkretny pionek.
+     * @return Kolor pionka.
+     */
     private Color getColorForPiece(Piece piece) {
         switch (piece.getColor()) {
             case RED_PIECE:
@@ -260,6 +310,11 @@ public class GUI extends Application {
     // Offset Y dla rysowania planszy
     private static final int OFFSET_Y = 300;
 
+    /**
+     * Metoda main.
+     *
+     * @param args Argumenty.
+     */
     public static void main(String[] args) {
         launch(args); // Uruchomienie aplikacji JavaFX
     }

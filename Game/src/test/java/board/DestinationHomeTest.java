@@ -1,6 +1,7 @@
 package board;
 
 import board.enums.HomeColor;
+import board.homes.DestinationHome;
 import board.mocks.MockBoardSetup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.beans.binding.Bindings.when;
 import static org.junit.jupiter.api.Assertions.*;
 
 

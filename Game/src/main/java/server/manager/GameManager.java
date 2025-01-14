@@ -14,6 +14,9 @@ import server.Observer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Klasa GameMamager służąca do zarządzania grą
+ */
 public class GameManager {
 
     private static  volatile GameManager gameManagerInstance;   // Jedyna instancja klasy GameManager
@@ -25,9 +28,18 @@ public class GameManager {
     private VictoryManager victoryManager;                      // Zarządca wygranej
     private YinAndYangManager yinAndYangManager;
 
+    /**
+     * Prywatny konstruktor, ponieważ korzystamy ze wzorca projektowego Singleton
+     */
     private GameManager(){ // Prywatny konstruktor
     }
 
+    /**
+     * Bezpieczna dla wielowątkowości metoda getInstance() zwracająca nam jedyną istniejącą w czasie gry
+     * instancję GameManager
+     *
+     * @return instancję GameManager
+     */
     public static GameManager getInstance() {
         // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
         GameManager gameManager = gameManagerInstance;
@@ -42,6 +54,11 @@ public class GameManager {
         }
     }
 
+    /**
+     * Metoda zwracjąca managera dla wariantu gry YingYang
+     *
+     * @return YingAndYangManager
+     */
     public synchronized YinAndYangManager getYinAndYangManager() {
         if (yinAndYangManager == null) {
             yinAndYangManager = new YinAndYangManager();
@@ -49,28 +66,54 @@ public class GameManager {
         return yinAndYangManager;
     }
 
-    // Dodanie obserwatora
+
+    /**
+     * Metoda dodaje obiekt typu Observer, Obserwer jest implementowany przez każdego Mediator, czyli klienta
+     * uczestniczącego w grze.
+     *
+     * @param observer Obserwator.
+     */
     public void addObserver(Observer observer) {
         observers.add(observer);
     }
 
-    //informowanie obserwatorów
+
+    /**
+     * Służy do przesłania informacji do wszystkich obserwatorów.
+     *
+     * @param message Treść wiadomości
+     */
     public void notifyObservers(String message) {
         for (Observer observer : new ArrayList<>(observers)) {//new ArrayList<>(observers) - aby uniknąć ConcurrentModificationException
             observer.update(message);
         }
     }
 
+    /**
+     * Getter.
+     *
+     * @return Listę Mediatorów, czyli graczy.
+     */
     public List<Mediator> getPlayers() {
         return players;
     }
 
+    /**
+     * Metoda określająca czy gra się rozpoczęła.
+     *
+     * @return Prawdę gdy gra sie rozpoczęła i fałsz w przeciwnym razie.
+     */
     public boolean isGameStarted() {
         return gameStarted;
     }
 
 
-    // Dodanie gracza
+    /**
+     * Metoda opdowiedzialna za dodanie gracza do gry.
+     *
+     * @param player Dany gracz.
+     * @return Prawdę jeśli gracz może jeszcze dołączyć do gry.
+     */
     public synchronized boolean addPlayer(Mediator player) {
         if (gameStarted) {
             player.sendMessage("Game has already started. You cannot join.");
@@ -99,7 +142,12 @@ public class GameManager {
         return true;
     }
 
-    // Obsługa komend
+    /**
+     * Obsługuje komendy wysyłane przez graczy do serwera.
+     *
+     * @param player Gracz, który wysłał komendę.
+     * @param command Treść komendy.
+     */
     public synchronized void handleCommand(Mediator player, String command) {
         // Jeśli gra się skończyła nie obsuguje już żadnych komend
         if (gameEnded) {
@@ -115,20 +163,26 @@ public class GameManager {
             } else {
                 player.sendMessage("Cannot enable Yin and Yang. Ensure there are exactly 2 players and the game hasn't started.");
             }
-        } else if(command.equals("join")) {
+        } else if(command.equalsIgnoreCase("join")) {
             addPlayer(player);
-        } else if (command.equals("game start")) {
+        } else if (command.equalsIgnoreCase("game start")) {
             startGame(player);
-        } else if (elementsOfCommand[0].equals("choose") && elementsOfCommand[1].equals("board")) {
+        } else if (elementsOfCommand[0].equalsIgnoreCase("choose") && elementsOfCommand[1].equalsIgnoreCase("board")) {
             chooseBoard(player, command);
-        } else if (elementsOfCommand[0].equals("move")) {
+        } else if (elementsOfCommand[0].equalsIgnoreCase("move")) {
             processMove(player, command);
-        } else if (command.equals("skip")) {
+        } else if (command.equalsIgnoreCase("skip")) {
             skipTurn(player);
         }
     }
 
-    // Rozpoczęcie gry
+    /**
+     * Metoda odpowiedzialna za rozpoczęcie gry.
+     * Sprawdza czy wszystkie potrzebne do rozpoczęcia warunki gry zostały spełnione.
+     * Ustawia flagę rozpoczęcia gry na true.
+     *
+     * @param sender gracz
+     */
     public void startGame(Mediator sender) {
         if (gameStarted) {
             sender.sendMessage("Game has already started.");
@@ -172,8 +226,12 @@ public class GameManager {
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");
     }
 
-
-    // Wybór planszy
+    /**
+     * Metoda odpowiedzialna za wybór planszy do gry.
+     *
+     * @param player Gracz.
+     * @param command Komenda wyboru planszy.
+     */
     private void chooseBoard(Mediator player, String command) {
         if (gameStarted) {
             player.sendMessage("Cannot change the board. The game has already started.");
@@ -183,7 +241,7 @@ public class GameManager {
             player.sendMessage("Board has already been chosen.");
             return;
         }
-        if (command.equals("choose board BigBoard")) {
+        if (command.equalsIgnoreCase("choose board BigBoard")) {
             ChooseBoard.getInstance().choose(1);    // Wybór BigBoard
             notifyObservers("Board chosen: Big Board (16x24).");
         } else {
@@ -191,7 +249,12 @@ public class GameManager {
         }
     }
 
-    // Obsługa ruchu
+    /**
+     * Obsługa ruchu wysyłanego przez terminal przez gracza.
+     *
+     * @param player Gracz.
+     * @param command Treść komendy ruchu.
+     */
     private void processMove(Mediator player, String command) {
         System.out.println("Processing move for player: " + player);
         System.out.println("Command: " + command);
@@ -233,7 +296,11 @@ public class GameManager {
         }
     }
 
-    // Pominięcie ruchu
+    /**
+     * Umożliwienie pominięcia swojego ruchu przez gracza.
+     *
+     * @param player Gracz.
+     */
     private void skipTurn(Mediator player) {
         if (!gameStarted) {
             player.sendMessage("Game has not started yet.");
@@ -254,6 +321,13 @@ public class GameManager {
         rulesManager.nextPlayer();
     }
 
+    /**
+     * Metoda, do której kieruje nas ClickHandler. Odpowiada ona za sprawdzenie i wykonanie ruchu przesłanego
+     * za pomocą klikania w GUI.
+     *
+     * @param selectedStartField Pole początkowe.
+     * @param selectedEndField Pole końcowe.
+     */
     public void processMoveFromClick(Field selectedStartField, Field selectedEndField) {
 
         MovesManager movesManager = new MovesManager(selectedStartField, selectedEndField);
@@ -276,6 +350,12 @@ public class GameManager {
         }
     }
 
+    /**
+     * Pobranie gracza za pomocą jego koloru pionka. Metoda potrzebna przy YingAndYang
+     *
+     * @param pieceColor Kolor pionka.
+     * @return Gracza o określonym kolorze pionka.
+     */
     public Mediator getPlayerByColor(PieceColor pieceColor) {
         if (pieceColor == PieceColor.BLACK_PIECE) {
             return players.get(0); // Zakładamy, że gracz z czarnymi pionkami jest pierwszy na liście
