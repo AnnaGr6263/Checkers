@@ -329,39 +329,36 @@ public class GameManager {
      * @param selectedEndField Pole końcowe.
      */
     public void processMoveFromClick(Field selectedStartField, Field selectedEndField) {
-
         MovesManager movesManager = new MovesManager(selectedStartField, selectedEndField);
-        if(movesManager.firstCheck()) {
-            PieceColor pieceColor = selectedStartField.getPiece().getColor();
-            Mediator currentPlayer = rulesManager.getPlayerByColor(pieceColor);
+        if (movesManager.firstCheck()) {
 
-            if (!rulesManager.canPlayerMove(currentPlayer, selectedStartField)) {
-                return;         // Gracz nie ma prawa wykonać ruchu.
+            PieceColor pieceColor = selectedStartField.getPiece().getColor();
+            Mediator currentPlayer;
+
+            // Użyj odpowiedniej metody w zależności od trybu gry
+            if (getYinAndYangManager().isYinAndYangEnabled()) {
+                currentPlayer = rulesManager. getPlayerByColorForYinAndYang(pieceColor);       // Uzyskanie gracza po kolore pionka dla Yin And Yang
+            } else {
+                currentPlayer = rulesManager.getPlayerByColor(pieceColor);      // Uzyskanie gracza po kolorze pionka gra klasyczna
             }
 
-            if(movesManager.isValidMove()) {
-                movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
-                rulesManager.nextPlayer();          // Przejście do kolejnego gracza
+            if (currentPlayer == null) { // Obsługa przypadku, gdy gracza nie znaleziono
+                System.err.println("Error: No player found for piece color: " + pieceColor);
+                return;
+            }
+
+            if (!rulesManager.canPlayerMove(currentPlayer, selectedStartField)) {
+                return; // Gracz nie ma prawa wykonać ruchu.
+            }
+
+            if (movesManager.isValidMove()) {
+                movesManager.performMove(); // Oddelegowanie całej logiki ruchu do MovesManager
+                rulesManager.nextPlayer(); // Przejście do kolejnego gracza
             } else {
                 currentPlayer.sendMessage("Invalid move.");
             }
         } else {
             System.out.println("Invalid move.");
         }
-    }
-
-    /**
-     * Pobranie gracza za pomocą jego koloru pionka. Metoda potrzebna przy YingAndYang
-     *
-     * @param pieceColor Kolor pionka.
-     * @return Gracza o określonym kolorze pionka.
-     */
-    public Mediator getPlayerByColor(PieceColor pieceColor) {
-        if (pieceColor == PieceColor.BLACK_PIECE) {
-            return players.get(0); // Zakładamy, że gracz z czarnymi pionkami jest pierwszy na liście
-        } else if (pieceColor == PieceColor.YELLOW_PIECE) {
-            return players.get(1); // Gracz z żółtymi pionkami jest drugi na liście
-        }
-        return null; // Dla innych kolorów
     }
 }

@@ -54,7 +54,7 @@ public class RulesManager {
         Map<PieceColor, HomeColor> pieceToHomeMapping = gameManager.getYinAndYangManager().getPieceToHomeMapping();
 
         for (Map.Entry<PieceColor, HomeColor> entry : pieceToHomeMapping.entrySet()) {
-            Mediator player = gameManager.getPlayerByColor(entry.getKey());
+            Mediator player = getPlayerByColorForYinAndYang(entry.getKey());
             if (player != null) {
                 homeAssignments.put(entry.getValue(), player);
             } else {
@@ -207,7 +207,7 @@ public class RulesManager {
      * @return Prawdę jeśli gracz jest posiadaczem pionków w takim kolorze i fałsz w przeciwnym razie.
      */
     private boolean playerOwnsPieceInYinAndYang(Mediator player, PieceColor pieceColor) {
-        Mediator owner = gameManager.getPlayerByColor(pieceColor); // Pobierz gracza, który posiada dany kolor pionka
+        Mediator owner = getPlayerByColorForYinAndYang(pieceColor); // Pobierz gracza, który posiada dany kolor pionka
         if (owner != null && owner.equals(player)) {
             return true; // Gracz jest właścicielem pionka
         }
@@ -268,6 +268,21 @@ public class RulesManager {
 
         // Jeśli nie znaleziono żadnego gracza, zwracamy null
         return null;
+    }
+
+    /**
+     * Pobranie gracza za pomocą jego koloru pionka. Metoda potrzebna przy YingAndYang
+     *
+     * @param pieceColor Kolor pionka.
+     * @return Gracza o określonym kolorze pionka.
+     */
+    public Mediator getPlayerByColorForYinAndYang(PieceColor pieceColor) {
+        if (pieceColor == PieceColor.BLACK_PIECE) {
+            return players.get(0); // Zakładamy, że gracz z czarnymi pionkami jest pierwszy na liście
+        } else if (pieceColor == PieceColor.YELLOW_PIECE) {
+            return players.get(1); // Gracz z żółtymi pionkami jest drugi na liście
+        }
+        return null; // Dla innych kolorów
     }
 
     /**
