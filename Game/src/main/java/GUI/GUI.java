@@ -19,17 +19,30 @@ import server.manager.YinAndYangManager;
 
 import javafx.scene.input.MouseEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Klasa odpowiedzialna za tworzenie i obsługę naszego GUI.
  */
 public class GUI extends Application {
 
-    private static GUI guiInstance;              // Singleton - jedyna instancja klasy GUI
+    private static List<GUI> guiInstances = new ArrayList<>();
     private static BoardSetup boardToInitialize; // Plansza przekazywana do GUI przed uruchomieniem
     private Pane root;                           // Główny kontener GUI
+    private Stage stage;                        // Okno GUI
     private BoardSetup board;                    // Obiekt planszy
     private ClickHandler clickHandler = new ClickHandler(); // Obiekt do obsługi kliknięć
     private static GameManager gameManager = GameManager.getInstance();
+
+    private static boolean isJavaFXRunning = false; // Flaga informująca, czy JavaFX działa
+
+    /**
+     * Konstruktor wymagany przez JavaFX (musi istnieć, nawet jeśli go nie używamy bezpośrednio).
+     */
+    public GUI() {
+        this.board = boardToInitialize; // Ustawienie planszy po utworzeniu obiektu
+    }
 
     /**
      * Ustawienie planszy do wykorzystania przez GUI
@@ -38,18 +51,6 @@ public class GUI extends Application {
      */
     public static void setBoard(BoardSetup board) {
         boardToInitialize = board; // Przechowaj dowolną instancję klasy BoardSetup
-    }
-
-    /**
-     * Pobranie instancji GUI (Singleton)
-     *
-     * @return Jedyną instancję GUI w grze.
-     */
-    public static GUI getInstance() {
-        if (guiInstance == null) {
-            throw new IllegalStateException("GUI instance has not been initialized yet!");
-        }
-        return guiInstance;
     }
 
     /**
@@ -67,30 +68,51 @@ public class GUI extends Application {
     }
 
     /**
-     * Metoda start
-     *
-     * @param primaryStage scena GUI.
+     * Uruchomienie JavaFX (jeśli jeszcze nie działa) i otwarcie GUI dla każdego gracza.
      */
-    @Override
-    public void start(Stage primaryStage) {
-        guiInstance = this; // Ustawienie instancji Singleton
+    public static void launchForPlayers(int numberOfPlayers) {
+        if (!isJavaFXRunning) {
+            new Thread(() -> Application.launch(GUI.class)).start(); // Uruchomienie JavaFX
+            isJavaFXRunning = true;
 
-        if (boardToInitialize == null) {
-            throw new IllegalStateException("Board must be set before launching GUI!"); // Sprawdzenie, czy plansza została ustawiona
+            try {
+                Thread.sleep(1000); // Poczekaj na pełne uruchomienie JavaFX
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
 
-        this.board = boardToInitialize; // Przypisz przekazaną planszę
+        // Tworzenie dodatkowych okien w wątku JavaFX
+        Platform.runLater(() -> {
+            for (int i = 0; i < numberOfPlayers; i++) {
+                GUI gui = new GUI();
+                guiInstances.add(gui);
+                gui.startNewWindow();
+            }
+        });
+    }
 
-        root = new Pane(); // Inicjalizacja głównego kontenera GUI
+    /**
+     * Metoda do uruchomienia okna GUI.
+     */
+    private void startNewWindow() {
+        Stage newStage = new Stage();
+        this.stage = newStage;
+        this.root = new Pane();
         drawGrid(); // Rysowanie siatki i etykiet
         drawFields(); // Rysowanie pól planszy
         drawPieces(); // Rysowanie pionków
 
-        // Konfiguracja sceny
-        Scene scene = new Scene(root, 800, 600, Color.WHITE);
-        primaryStage.setTitle("Chinese Checkers Board"); // Tytuł okna
-        primaryStage.setScene(scene);
-        primaryStage.show(); // Wyświetlenie okna
+        Scene scene = new Scene(root, 800, 600);
+        newStage.setTitle("Chinese Checkers - Player " + (guiInstances.size()));
+        newStage.setScene(scene);
+        newStage.show();
+    }
+
+
+    @Override
+    public void start(Stage primaryStage) {
+        isJavaFXRunning = true; // JavaFX jest uruchomiony
     }
 
     /**
@@ -104,6 +126,15 @@ public class GUI extends Application {
             drawFields(); // Narysuj pola planszy
             drawPieces(); // Narysuj pionki
         });
+    }
+
+    /**
+     * Odświeżenie wszystkich instancji GUI.
+     */
+    public static void refreshAll() {
+        for (GUI gui : guiInstances) {
+            gui.refresh();
+        }
     }
 
     /**

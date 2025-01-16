@@ -1,5 +1,4 @@
 package server.manager;
-import GUI.GUI;
 import GUI.GUIMoves;
 import board.Field;
 import board.Piece;
@@ -26,8 +25,8 @@ public class MovesManager {
         this.startField = startField;
         this.endField = endField;
 
-        // Uzyskaj instancję GUI i zainicjalizuj GUIMoves
-        GUI gui = GUI.getInstance();
+        // Zainicjalizuj GUIMoves
+
         this.guiMoves = new GUIMoves();
     }
 

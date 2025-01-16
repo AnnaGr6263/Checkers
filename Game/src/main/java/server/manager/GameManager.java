@@ -5,7 +5,6 @@ import board.fill.FillWIthPieces;
 import board.fill.FillWithPiecesYinAndYang;
 import board.homes.DestinationHome;
 import board.homes.DestinationHomeYinAndYang;
-import javafx.application.Application;
 import GUI.GUI;
 import server.ChooseBoard;
 import server.Mediator;
@@ -191,6 +190,7 @@ public class GameManager {
         if (!ChooseBoard.getInstance().isBoardChosen()) { // Sprawdzenie, czy plansza została wybrana
             sender.sendMessage("Please choose a board before starting the game using the command 'choose board BigBoard'.");
             return;
+
         }
         if (players.size() != 2 && players.size() != 3 && players.size() != 4 && players.size() != 6) {
             sender.sendMessage("Game requires 2, 3, 4, or 6 players.");
@@ -214,13 +214,16 @@ public class GameManager {
         rulesManager = new RulesManager(players);
         rulesManager.startGame();
 
+        int numberOfPlayers = players.size(); // Pobranie liczby graczy
+
         // Przekazanie instancji planszy do GUI
         BoardSetup currentBoard = ChooseBoard.getInstance().getBoard();
         System.out.println("Starting GUI...");
-        new Thread(() -> {
-            GUI.setBoard(currentBoard); // Przekazanie planszy
-            Application.launch(GUI.class); // Uruchomienie GUI
-        }).start();
+
+        GUI.setBoard(currentBoard);
+
+        // Uruchomienie GUI dla każdego gracza
+        GUI.launchForPlayers(numberOfPlayers);
 
         // Powiadom pierwszego gracza o jego ruchu
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");

@@ -33,7 +33,7 @@ public class GUIMoves {
             endField.setPiece(piece); // Umieść pionek na docelowym polu
         }
 
-        // Odśwież GUI, aby pokazać zmiany
-        Platform.runLater(() -> GUI.getInstance().refresh());
+        // Odśwież wszystkie GUI
+        Platform.runLater(() -> GUI.refreshAll());
     }
 }
