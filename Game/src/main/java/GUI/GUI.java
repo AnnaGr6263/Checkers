@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class GUI extends Application {
 
-    private static List<GUI> guiInstances = new ArrayList<>();
+    private static List<GUI> guiInstances = new ArrayList<>(); // Lista wszystkich instancji GUI
     private static BoardSetup boardToInitialize; // Plansza przekazywana do GUI przed uruchomieniem
     private Pane root;                           // Główny kontener GUI
     private Stage stage;                        // Okno GUI
@@ -83,14 +83,17 @@ public class GUI extends Application {
      * Uruchomienie JavaFX (jeśli jeszcze nie działa) i otwarcie GUI dla każdego gracza.
      */
     public static void launchForPlayers(int numberOfPlayers, List<PieceColor> piecesInGame) {
+        synchronized (GUI.class) {      // Synchronizacja na klasie GUI
         if (!isJavaFXRunning) {
             new Thread(() -> Application.launch(GUI.class)).start(); // Uruchomienie JavaFX
-            isJavaFXRunning = true;
 
-            try {
-                Thread.sleep(1000); // Poczekaj na pełne uruchomienie JavaFX
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                try {
+                    while (!isJavaFXRunning) {
+                        GUI.class.wait();       // Czekamy na uruchomienie JavaFX, mając blokadę
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();     // Zachowaj flagę przerwania
+                }
             }
         }
 
@@ -159,10 +162,17 @@ public class GUI extends Application {
         newStage.show();
     }
 
-
+    /**
+     * Metoda start() wymagana przez JavaFX.
+     *
+     * @param primaryStage Główne okno GUI.
+     */
     @Override
     public void start(Stage primaryStage) {
-        isJavaFXRunning = true; // JavaFX jest uruchomiony
+        synchronized (GUI.class) {      // Synchronizacja powiadomienia
+            isJavaFXRunning = true;     // JavaFX jest uruchomiony
+            GUI.class.notifyAll();      // Powiadom wątek, który czekał w launchForPlayers()
+        }
     }
 
     /**

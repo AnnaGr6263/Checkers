@@ -231,6 +231,7 @@ public class GameManager {
         BoardSetup currentBoard = ChooseBoard.getInstance().getBoard();
         System.out.println("Starting GUI...");
 
+        // Ustawienie planszy w GUI
         GUI.setBoard(currentBoard);
 
         // Uruchomienie GUI dla każdego gracza
