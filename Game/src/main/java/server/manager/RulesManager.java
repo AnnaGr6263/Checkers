@@ -88,7 +88,7 @@ public class RulesManager {
      * @param playerCount liczba graczy.
      * @return Listę kolorów w grze.
      */
-    private List<HomeColor> getHomesForPlayerCount(int playerCount) {
+    public List<HomeColor> getHomesForPlayerCount(int playerCount) {
         switch (playerCount) {
             case 2:
                 return Arrays.asList(HomeColor.RED, HomeColor.BLUE);
@@ -286,13 +286,13 @@ public class RulesManager {
     }
 
     /**
-     * Metoda pomocnicza do mapowania HomeColor na PieceColor.
+     * Metoda do mapowania HomeColor na PieceColor.
      * Przypisuje kolorowi domku odpowiadający mu kolor pionków.
      *
      * @param homeColor Kolor domku.
      * @return Kolor pionków.
      */
-    private PieceColor mapHomeColorToPieceColor(HomeColor homeColor) {
+    public PieceColor mapHomeColorToPieceColor(HomeColor homeColor) {
         switch (homeColor) {
             case RED:
                 return PieceColor.RED_PIECE;

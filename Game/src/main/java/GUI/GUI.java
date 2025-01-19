@@ -4,6 +4,7 @@ import board.BoardSetup;
 import board.Field;
 import board.Piece;
 import board.enums.HomeColor;
+import board.enums.PieceColor;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -34,14 +35,25 @@ public class GUI extends Application {
     private BoardSetup board;                    // Obiekt planszy
     private ClickHandler clickHandler = new ClickHandler(); // Obiekt do obsługi kliknięć
     private static GameManager gameManager = GameManager.getInstance();
+    private int guiId = 0;
+    private PieceColor playerColor;
 
     private static boolean isJavaFXRunning = false; // Flaga informująca, czy JavaFX działa
+
 
     /**
      * Konstruktor wymagany przez JavaFX (musi istnieć, nawet jeśli go nie używamy bezpośrednio).
      */
-    public GUI() {
+    public GUI() {};
+
+    /**
+     * Konstruktor z parametrem.
+     *
+     * @param id Id konkretnego GUI.
+     */
+    public GUI(int id) {
         this.board = boardToInitialize; // Ustawienie planszy po utworzeniu obiektu
+        this.guiId = id;
     }
 
     /**
@@ -70,7 +82,7 @@ public class GUI extends Application {
     /**
      * Uruchomienie JavaFX (jeśli jeszcze nie działa) i otwarcie GUI dla każdego gracza.
      */
-    public static void launchForPlayers(int numberOfPlayers) {
+    public static void launchForPlayers(int numberOfPlayers, List<PieceColor> piecesInGame) {
         if (!isJavaFXRunning) {
             new Thread(() -> Application.launch(GUI.class)).start(); // Uruchomienie JavaFX
             isJavaFXRunning = true;
@@ -85,11 +97,29 @@ public class GUI extends Application {
         // Tworzenie dodatkowych okien w wątku JavaFX
         Platform.runLater(() -> {
             for (int i = 0; i < numberOfPlayers; i++) {
-                GUI gui = new GUI();
+                GUI gui = new GUI(i);
+                PieceColor pieceColor = piecesInGame.get(i);
+                gui.setColor(pieceColor);
                 guiInstances.add(gui);
                 gui.startNewWindow();
             }
         });
+    }
+
+    public int getGuiId() {
+        return guiId;
+    }
+
+    public static List<GUI> getGuiInstances() {
+        return guiInstances;
+    }
+
+    public void setColor(PieceColor color) {
+        this.playerColor = color;
+    }
+
+    public PieceColor getColor() {
+        return playerColor;
     }
 
     /**
@@ -104,7 +134,7 @@ public class GUI extends Application {
         drawPieces(); // Rysowanie pionków
 
         Scene scene = new Scene(root, 800, 600);
-        newStage.setTitle("Chinese Checkers - Player " + (guiInstances.size()));
+        newStage.setTitle("Chinese Checkers - Player " + guiInstances.getLast().getColor().toString());
         newStage.setScene(scene);
         newStage.show();
     }
@@ -256,7 +286,8 @@ public class GUI extends Application {
      * @param circle Element graficzny pola w GUI.
      */
     private void handleFieldClick(MouseEvent event, Field field, Circle circle) {
-        clickHandler.handle(field, circle);
+        System.out.println("Clicked on GUI instance ID: " + guiId); // Dodaj informacje o ID GUI
+        clickHandler.handle(field, circle, guiId);
     }
 
     /**

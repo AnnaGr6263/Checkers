@@ -26,7 +26,7 @@ public class ClickHandler {
      * @param clickedField Pole, które zostało kliknięte.
      * @param circle Obiekt koła, graficzna reprezentacja w GUI naszego klikniętego pola.
      */
-    public void handle(Field clickedField, Circle circle) {
+    public void handle(Field clickedField, Circle circle, int guiId) {
 
         if (selectedStartField == null) {
             circleToHighlight = circle;
@@ -36,7 +36,7 @@ public class ClickHandler {
             selectedEndField = clickedField;
 
             removeHighlight(circleToHighlight);
-            GameManager.getInstance().processMoveFromClick(selectedStartField, selectedEndField);
+            GameManager.getInstance().processMoveFromClick(selectedStartField, selectedEndField, guiId);
 
             selectedStartField = null;
             selectedEndField = null;

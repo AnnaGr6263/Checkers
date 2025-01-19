@@ -1,5 +1,6 @@
 package server.manager;
 import board.*;
+import board.enums.HomeColor;
 import board.enums.PieceColor;
 import board.fill.FillWIthPieces;
 import board.fill.FillWithPiecesYinAndYang;
@@ -214,7 +215,17 @@ public class GameManager {
         rulesManager = new RulesManager(players);
         rulesManager.startGame();
 
-        int numberOfPlayers = players.size(); // Pobranie liczby graczy
+
+        List<PieceColor> piecesInGame = new ArrayList<>();
+        if(yinAndYangManager.isYinAndYangEnabled()) {
+            piecesInGame.add(PieceColor.BLACK_PIECE);
+            piecesInGame.add(PieceColor.YELLOW_PIECE);
+        } else {
+            List<HomeColor> homeColorsInGame = rulesManager.getHomesForPlayerCount(players.size());
+            for (HomeColor homeColor : homeColorsInGame) {
+                piecesInGame.add(rulesManager.mapHomeColorToPieceColor(homeColor));
+            }
+        }
 
         // Przekazanie instancji planszy do GUI
         BoardSetup currentBoard = ChooseBoard.getInstance().getBoard();
@@ -223,7 +234,7 @@ public class GameManager {
         GUI.setBoard(currentBoard);
 
         // Uruchomienie GUI dla każdego gracza
-        GUI.launchForPlayers(numberOfPlayers);
+        GUI.launchForPlayers(players.size(), piecesInGame);
 
         // Powiadom pierwszego gracza o jego ruchu
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");
@@ -331,12 +342,28 @@ public class GameManager {
      * @param selectedStartField Pole początkowe.
      * @param selectedEndField Pole końcowe.
      */
-    public void processMoveFromClick(Field selectedStartField, Field selectedEndField) {
+    public void processMoveFromClick(Field selectedStartField, Field selectedEndField, int guiId) {
+
+
         MovesManager movesManager = new MovesManager(selectedStartField, selectedEndField);
         if (movesManager.firstCheck()) {
 
             PieceColor pieceColor = selectedStartField.getPiece().getColor();
             Mediator currentPlayer;
+
+            // Bierzemy instancje gui
+            List<GUI> guiInstances = GUI.getGuiInstances();
+            for(int i =0; i < guiInstances.size(); i++) {
+                if(guiInstances.get(i).getGuiId() == guiId){        // Szukamy tej instancji, którą nacisnęliśmy
+                    GUI currentGUI = guiInstances.get(i);
+                    PieceColor guiColor = currentGUI.getColor();
+                    // Jeśli wybrany kolor pionka jest inny niż przypisany do gui to nie możeny wykonać ruchu, bo to nie nasze GUI
+                    if(!pieceColor.equals(guiColor)) {
+                        System.err.println("It is not your GUI.");
+                        return;
+                    }
+                }
+            }
 
             // Użyj odpowiedniej metody w zależności od trybu gry
             if (getYinAndYangManager().isYinAndYangEnabled()) {
