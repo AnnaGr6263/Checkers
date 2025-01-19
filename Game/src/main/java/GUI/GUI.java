@@ -106,18 +106,38 @@ public class GUI extends Application {
         });
     }
 
+    /**
+     * Getter.
+     *
+     * @return guiId
+     */
     public int getGuiId() {
         return guiId;
     }
 
+    /**
+     * Pobiera instancje gui (wszystkie).
+     *
+     * @return zwraca wszystkie instancje gui.
+     */
     public static List<GUI> getGuiInstances() {
         return guiInstances;
     }
 
+    /**
+     * Ustawia dla gui kolor jego pionków.
+     *
+     * @param color kolor pionków.
+     */
     public void setColor(PieceColor color) {
         this.playerColor = color;
     }
 
+    /**
+     * Getter.
+     *
+     * @return kolor pionków w danym gui.
+     */
     public PieceColor getColor() {
         return playerColor;
     }
