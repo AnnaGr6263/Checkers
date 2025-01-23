@@ -7,6 +7,7 @@ import board.fill.FillWithPiecesYinAndYang;
 import board.homes.DestinationHome;
 import board.homes.DestinationHomeYinAndYang;
 import GUI.GUI;
+import bot.Bot;
 import server.ChooseBoard;
 import server.Mediator;
 import server.Observer;
@@ -193,8 +194,14 @@ public class GameManager {
             return;
 
         }
-        if (players.size() != 2 && players.size() != 3 && players.size() != 4 && players.size() != 6) {
-            sender.sendMessage("Game requires 2, 3, 4, or 6 players.");
+        if (players.size() == 1) {
+            Bot bot = new Bot(PieceColor.BLUE_PIECE); // Bot dostaje niebieskie pionki
+            players.add(bot);
+            addObserver(bot);
+            notifyObservers("Bot dołączył do gry jako drugi gracz!");
+        }
+        if (players.size() != 1 && players.size() != 2 && players.size() != 3 && players.size() != 4 && players.size() != 6) {
+            sender.sendMessage("Game requires 1, 2, 3, 4, or 6 players.");
             return;
         }
         gameStarted = true; // Ustawienie flagi rozpoczęcia gry
@@ -215,7 +222,15 @@ public class GameManager {
         rulesManager = new RulesManager(players);
         rulesManager.startGame();
 
+        // Tworzenie listy graczy bez botów
+        List<Mediator> humanPlayers = new ArrayList<>();
+        for (Mediator player : players) {
+            if (!(player instanceof Bot)) {     // Sprawdzamy, czy gracz NIE jest botem
+                humanPlayers.add(player);
+            }
+        }
 
+        // Lista kolorów pionków dostępnych w grze
         List<PieceColor> piecesInGame = new ArrayList<>();
         if(yinAndYangManager.isYinAndYangEnabled()) {
             piecesInGame.add(PieceColor.BLACK_PIECE);
@@ -235,7 +250,7 @@ public class GameManager {
         GUI.setBoard(currentBoard);
 
         // Uruchomienie GUI dla każdego gracza
-        GUI.launchForPlayers(players.size(), piecesInGame);
+        GUI.launchForPlayers(humanPlayers.size(), piecesInGame);
 
         // Powiadom pierwszego gracza o jego ruchu
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");

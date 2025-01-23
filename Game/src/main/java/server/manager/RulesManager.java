@@ -1,7 +1,10 @@
 package server.manager;
+import GUI.GUI;
 import board.Field;
 import board.enums.HomeColor;
 import board.enums.PieceColor;
+import bot.Bot;
+import javafx.application.Platform;
 import server.Mediator;
 
 import java.util.*;
@@ -128,7 +131,12 @@ public class RulesManager {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         Mediator currentPlayer = getCurrentPlayer();
         System.out.println("Next player is: " + currentPlayer);
-        currentPlayer.sendMessage("It's your turn!");
+        if (currentPlayer instanceof Bot) {     // Jeśli gracz to bot, to wykonaj ruch
+            ((Bot) currentPlayer).makeMove();   // Wykonaj ruch bota
+            Platform.runLater(() -> GUI.refreshAll());
+        } else {
+            currentPlayer.sendMessage("It's your turn!");
+        }
     }
 
     /**
