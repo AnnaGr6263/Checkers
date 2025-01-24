@@ -28,6 +28,7 @@ public class GameManager {
     private RulesManager rulesManager;                          // Zarządca zasad gry
     private VictoryManager victoryManager;                      // Zarządca wygranej
     private YinAndYangManager yinAndYangManager;
+    private Thread botThread;
 
     /**
      * Prywatny konstruktor, ponieważ korzystamy ze wzorca projektowego Singleton
@@ -195,10 +196,7 @@ public class GameManager {
 
         }
         if (players.size() == 1) {
-            Bot bot = new Bot(PieceColor.BLUE_PIECE); // Bot dostaje niebieskie pionki
-            players.add(bot);
-            addObserver(bot);
-            notifyObservers("Bot dołączył do gry jako drugi gracz!");
+            startBotThread(PieceColor.BLUE_PIECE);
         }
         if (players.size() != 1 && players.size() != 2 && players.size() != 3 && players.size() != 4 && players.size() != 6) {
             sender.sendMessage("Game requires 1, 2, 3, 4, or 6 players.");
@@ -254,6 +252,32 @@ public class GameManager {
 
         // Powiadom pierwszego gracza o jego ruchu
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");
+    }
+
+    /**
+     * Tworzy i uruchamia nowy wątek bota dla danego koloru pionków.
+     * Dodaje bota do listy graczy, rejestruje go jako obserwatora i powiadamia pozostałych graczy o jego dołączeniu.
+     *
+     * @param botColor Kolor pionków bota (RED_PIECE, BLUE_PIECE itp.).
+     */
+    private void startBotThread(PieceColor botColor) {
+        // Tworzy nową instancję bota dla danego koloru
+        Bot bot = new Bot(botColor);
+
+        // Tworzy nowy wątek i przypisuje do niego bota
+        botThread = new Thread(bot);
+
+        // Uruchamia wątek bota
+        botThread.start();
+
+        // Dodaje bota do listy graczy
+        players.add(bot);
+
+        // Rejestruje bota jako obserwatora gry
+        addObserver(bot);
+
+        // Powiadamia wszystkich obserwatorów (np. innych graczy) o dołączeniu bota do gry
+        notifyObservers("Bot joined the game!");
     }
 
     /**
@@ -324,6 +348,20 @@ public class GameManager {
         } else {
             player.sendMessage("Invalid move.");
         }
+    }
+
+    /**
+     * Getter.
+     **/
+    public Mediator getCurrentPlayer() {
+        return rulesManager.getCurrentPlayer();
+    }
+
+    /**
+     * Getter.
+     **/
+    public RulesManager getRulesManager() {
+        return rulesManager;
     }
 
     /**
