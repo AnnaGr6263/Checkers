@@ -26,7 +26,6 @@ public class Bot extends Mediator implements Runnable {
     private final Random random = new Random();     // Generator losowy do wyboru ruchów
     private volatile boolean running = true;        // Flaga określająca, czy bot ma działać
     private static final ReentrantLock moveLock = new ReentrantLock(); // Blokada synchronizująca ruchy wielu botów
-    private final List<Field> destinationFields; // Lista pól docelowych
 
     /**
      * Konstruktor inicjalizujący bota z przypisanym kolorem.
@@ -35,9 +34,6 @@ public class Bot extends Mediator implements Runnable {
     public Bot(PieceColor botColor) {
         super(null);
         this.botColor = botColor;
-
-        // Pobranie tej samej instancji DestinationHome, która została utworzona w GameManager
-        this.destinationFields = gameManager.getVictoryManager().getDestinationHomesMap().get(botColor);
     }
 
     /**
@@ -64,6 +60,22 @@ public class Bot extends Mediator implements Runnable {
                 running = false;            // Zatrzymanie bota w przypadku przerwania wątku
             }
         }
+    }
+
+    /**
+     * Metoda sprawdzająca, czy bot wygrał.
+     * Pobiera VictoryManager dynamicznie
+     * @return true, jeśli bot wygrał; false, jeśli jeszcze nie.
+     */
+    private boolean hasBotWon() {
+        VictoryManager victoryManager = gameManager.getVictoryManager();
+
+        if (victoryManager == null) {
+            sendMessage("[BOT] VictoryManager is not initialized yet.");
+            return false;
+        }
+
+        return victoryManager.checkVictory(botColor);
     }
 
     /**
@@ -105,11 +117,11 @@ public class Bot extends Mediator implements Runnable {
                         sendMessage("[BOT] Performing move: " + command);
                         gameManager.handleCommand(this, command); // Wysłanie ruchu do systemu gry
 
-                        // Sprawdzenie wygranej dla bota
-                        if (gameManager.getVictoryManager().checkVictory(botColor)) {
-                            gameManager.notifyObservers("Bot with color " + botColor + " takes " + gameManager.getVictoryManager().whichPlace() + " place.");
+                        // eraz sprawdzamy wygraną dopiero po wykonaniu ruchu
+                        if (hasBotWon()) {
+                            gameManager.notifyObservers("Bot with color " + botColor +
+                                    " takes " + gameManager.getVictoryManager().whichPlace() + " place.");
 
-                            // Jeśli gra się skończyła, zakończ ją dla wszystkich
                             if (gameManager.getVictoryManager().isEnd()) {
                                 gameManager.notifyObservers("End of the game.");
                                 gameManager.endGame();
@@ -224,12 +236,26 @@ public class Bot extends Mediator implements Runnable {
     }
 
     /**
+     * Pobiera pola docelowe bota dopiero w momencie ich użycia.
+     * @return Lista pól docelowych dla bota.
+     */
+    private List<Field> getDestinationFields() {
+        VictoryManager victoryManager = gameManager.getVictoryManager();
+        if (victoryManager == null) {
+            return new ArrayList<>();
+        }
+
+        return victoryManager.getDestinationHomesMap().getOrDefault(botColor, new ArrayList<>());
+    }
+
+    /**
      * Oblicza dystans Manhattanowski od danego pola do najbliższego celu bota.
      * @param field Pole, dla którego liczymy dystans.
      * @return Najmniejsza odległość do pola docelowego.
      */
     private int calculateDistanceToGoal(Field field) {
         int minDistance = Integer.MAX_VALUE;
+        List<Field> destinationFields = getDestinationFields();
 
         // Iteracja przez wszystkie pola docelowe bota
         for (Field target : destinationFields) {

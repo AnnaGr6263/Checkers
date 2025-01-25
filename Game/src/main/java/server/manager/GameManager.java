@@ -193,11 +193,12 @@ public class GameManager {
         if (!ChooseBoard.getInstance().isBoardChosen()) { // Sprawdzenie, czy plansza została wybrana
             sender.sendMessage("Please choose a board before starting the game using the command 'choose board BigBoard'.");
             return;
-
         }
+
         if (players.size() == 1) {
             startBotThread(PieceColor.BLUE_PIECE);
         }
+
         if (players.size() != 1 && players.size() != 2 && players.size() != 3 && players.size() != 4 && players.size() != 6) {
             sender.sendMessage("Game requires 1, 2, 3, 4, or 6 players.");
             return;

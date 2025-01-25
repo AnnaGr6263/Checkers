@@ -93,6 +93,8 @@ public class RulesManager {
      */
     public List<HomeColor> getHomesForPlayerCount(int playerCount) {
         switch (playerCount) {
+            case 1:
+                return Arrays.asList(HomeColor.RED);
             case 2:
                 return Arrays.asList(HomeColor.RED, HomeColor.BLUE);
             case 3:
