@@ -350,19 +350,6 @@ public class GameManager {
         }
     }
 
-    /**
-     * Getter.
-     **/
-    public Mediator getCurrentPlayer() {
-        return rulesManager.getCurrentPlayer();
-    }
-
-    /**
-     * Getter.
-     **/
-    public RulesManager getRulesManager() {
-        return rulesManager;
-    }
 
     /**
      * Umożliwienie pominięcia swojego ruchu przez gracza.
@@ -444,5 +431,36 @@ public class GameManager {
         } else {
             System.out.println("Invalid move.");
         }
+    }
+
+    /**
+     * Kończy grę, ustawiając flagę gameEnded na true
+     */
+    public void endGame() {
+        if (!gameEnded) {
+            gameEnded = true;
+        }
+    }
+
+
+    /**
+     * Getter.
+     **/
+    public Mediator getCurrentPlayer() {
+        return rulesManager.getCurrentPlayer();
+    }
+
+    /**
+     * Getter.
+     **/
+    public RulesManager getRulesManager() {
+        return rulesManager;
+    }
+
+    /**
+     * Getter.
+     **/
+    public VictoryManager getVictoryManager() {
+        return victoryManager;
     }
 }

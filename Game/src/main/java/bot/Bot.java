@@ -1,10 +1,17 @@
 package bot;
 
+import board.BoardSetup;
+import board.homes.DestinationHome;
 import server.Mediator;
+import server.manager.CommandManager;
 import server.manager.GameManager;
 import board.Field;
 import board.enums.PieceColor;
 import server.ChooseBoard;
+import server.manager.MovesManager;
+import server.manager.VictoryManager;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
@@ -15,10 +22,11 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Bot extends Mediator implements Runnable {
     private final PieceColor botColor;              // Kolor pionków bota
-    private final GameManager gameManager;          // Instancja zarządzania grą
+    private final GameManager gameManager = GameManager.getInstance();          // Instancja zarządzania grą
     private final Random random = new Random();     // Generator losowy do wyboru ruchów
     private volatile boolean running = true;        // Flaga określająca, czy bot ma działać
     private static final ReentrantLock moveLock = new ReentrantLock(); // Blokada synchronizująca ruchy wielu botów
+    private final List<Field> destinationFields; // Lista pól docelowych
 
     /**
      * Konstruktor inicjalizujący bota z przypisanym kolorem.
@@ -27,7 +35,9 @@ public class Bot extends Mediator implements Runnable {
     public Bot(PieceColor botColor) {
         super(null);
         this.botColor = botColor;
-        this.gameManager = GameManager.getInstance();
+
+        // Pobranie tej samej instancji DestinationHome, która została utworzona w GameManager
+        this.destinationFields = gameManager.getVictoryManager().getDestinationHomesMap().get(botColor);
     }
 
     /**
@@ -52,72 +62,185 @@ public class Bot extends Mediator implements Runnable {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 running = false;            // Zatrzymanie bota w przypadku przerwania wątku
-
             }
         }
     }
 
     /**
-     * Wykonuje ruch bota, jeśli jest jego kolej.
+     * Metoda wykonująca ruch bota w grze.
+     * Bot próbuje znaleźć losowy pionek i wykonać legalny ruch.
+     * Priorytetowo sprawdza ruchy w obrębie gwiazdy, a jeśli żaden ruch nie jest poprawny,
+     * pomija turę po określonej liczbie prób.
      */
     public void makeMove() {
-        // Sprawdzenie, czy to rzeczywiście tura tego bota
+        // Sprawdzenie, czy to rzeczywiście tura bota
         if (gameManager.getCurrentPlayer() != this) {
             return;
         }
 
-        // Wybór losowego pionka do przesunięcia
-        Field startField = getRandomStartField();
-        if (startField == null) {
-            sendMessage("[BOT] No valid move found, skipping turn.");
-            gameManager.getRulesManager().nextPlayer();     // Przekazanie tury innemu graczowi
-            return;
+        int maxAttempts = 10; // Ograniczenie liczby prób znalezienia poprawnego ruchu
+        int attempts = 0;
+
+        while (attempts < maxAttempts) {
+            try {
+                // Wybór losowego pionka do ruchu
+                Field startField = getRandomStartField();
+                if (startField == null) {
+                    sendMessage("[BOT] No valid move found, skipping turn.");
+                    gameManager.getRulesManager().nextPlayer();
+                    return;
+                }
+
+                // Wybór najlepszego dostępnego ruchu dla wybranego pionka
+                Field endField = getBestValidMove(startField);
+                if (endField != null) {
+                    // Formatowanie komendy ruchu w postaci "move XxY->AxB"
+                    String moveKey = startField.getRow() + "x" + startField.getCol() + "->" +
+                            endField.getRow() + "x" + endField.getCol();
+                    String command = "move " + moveKey;
+
+                    // Sprawdzenie, czy ruch znajduje się w obrębie gwiazdy
+                    CommandManager commandManager = new CommandManager(this, command);
+                    if (commandManager.isMoveIntoStar()) {
+                        sendMessage("[BOT] Performing move: " + command);
+                        gameManager.handleCommand(this, command); // Wysłanie ruchu do systemu gry
+
+                        // Sprawdzenie wygranej dla bota
+                        if (gameManager.getVictoryManager().checkVictory(botColor)) {
+                            gameManager.notifyObservers("Bot with color " + botColor + " takes " + gameManager.getVictoryManager().whichPlace() + " place.");
+
+                            // Jeśli gra się skończyła, zakończ ją dla wszystkich
+                            if (gameManager.getVictoryManager().isEnd()) {
+                                gameManager.notifyObservers("End of the game.");
+                                gameManager.endGame();
+                            }
+                        }
+                        return;
+                    } else {
+                        sendMessage("[BOT] Move is outside the star, searching for another move.");
+                    }
+                }
+            } catch (IllegalArgumentException e) {
+                // Obsługa wyjątku w przypadku próby wykonania niepoprawnego ruchu (np. wyjście poza planszę)
+                sendMessage("[BOT] Invalid move detected: " + e.getMessage());
+            } catch (Exception e) {
+                // Obsługa innych nieoczekiwanych błędów
+                sendMessage("[BOT] Unexpected error while making a move: " + e.getMessage());
+            }
+            attempts++; // Zwiększenie licznika prób
         }
 
-        // Wybór losowego, poprawnego ruchu dla wybranego pionka
-        Field endField = getRandomValidMove(startField);
-        if (endField != null) {
-
-            // Tworzenie komendy ruchu w formacie "move XxY->AxB"
-            String moveKey = startField.getRow() + "x" + startField.getCol() + "->" +
-                    endField.getRow() + "x" + endField.getCol();
-
-            String command = "move " + moveKey;
-            sendMessage("[BOT] Performing move: " + command);
-            gameManager.handleCommand(this, command);
-
-            // Ważne: Nie wywołujemy `nextPlayer()` od razu!
-            // System sam zmieni gracza po obsłudze ruchu
-        }
+        // Jeśli bot nie znalazł poprawnego ruchu po określonej liczbie prób, pomija swoją turę
+        sendMessage("[BOT] No valid move found after " + maxAttempts + " attempts, skipping turn.");
+        gameManager.getRulesManager().nextPlayer();
     }
 
     /**
-     * Wybiera losowy pionek bota, który może się poruszyć.
-     * @return Pole, na którym znajduje się wybrany pionek bota lub null, jeśli nie ma dostępnych pionków.
+     * Wybiera losowy pionek należący do bota, który może wykonać ruch.
+     * Bot przeszukuje całą planszę i zbiera wszystkie pionki w swoim kolorze.
+     * Jeśli nie ma dostępnych pionków do ruchu, zwraca `null`.
+     * W przeciwnym razie wybiera losowy pionek spośród dostępnych.
+     *
+     * @return Losowo wybrany pionek bota do ruchu lub `null`, jeśli brak dostępnych pionków.
      */
     private Field getRandomStartField() {
-        List<Field> fields = ChooseBoard.getInstance().getBoard().getFieldsInsideAStar();
+        List<Field> botFields = new ArrayList<>(); // Lista pól, na których znajdują się pionki bota
+        List<Field> fields = ChooseBoard.getInstance().getBoard().getFieldsInsideAStar(); // Pobranie wszystkich pól wewnątrz gwiazdy
+
+        // Przeszukiwanie pól w poszukiwaniu pionków bota
         for (Field field : fields) {
             if (field.hasPiece() && field.getPiece().getColor() == botColor) {
-                return field;   // Zwraca pierwszy znaleziony pionek bota
+                botFields.add(field); // Dodanie do listy pionków bota
             }
         }
-        return null;         // Brak dostępnych pionków do ruchu
+
+        // Jeśli nie znaleziono żadnego pionka do ruchu, zwróć `null`
+        if (botFields.isEmpty()) {
+            return null;
+        }
+
+        // Wybór losowego pionka z listy dostępnych
+        return botFields.get(random.nextInt(botFields.size()));
     }
 
     /**
-     * Wybiera losowe dostępne pole, na które można przesunąć dany pionek.
-     * @param startField Pole startowe, z którego ma ruszyć pionek.
-     * @return Pole docelowe, jeśli istnieje poprawny ruch, lub null, jeśli brak możliwości ruchu.
+     * Wybiera najlepszy możliwy ruch dla bota, uwzględniając zarówno skoki nad pionkami, jak i ruch na sąsiednie pole.
+     * Priorytetowo traktuje skoki, jeśli są dostępne, ponieważ mogą pozwolić na szybsze przemieszczanie się do celu.
+     * Wybór ruchu opiera się na minimalizacji dystansu do docelowego obszaru bota.
+     *
+     * @param startField Pole, z którego bot wykonuje ruch.
+     * @return Najlepsze pole docelowe lub `null`, jeśli żaden ruch nie jest możliwy.
      */
-    private Field getRandomValidMove(Field startField) {
-        List<Field> neighbors = startField.getNeighbours();
+    private Field getBestValidMove(Field startField) {
+        List<Field> neighbors = startField.getNeighbours(); // Pobranie sąsiadujących pól
+        Field bestMove = null;
+        int minDistance = Integer.MAX_VALUE;
+        BoardSetup board = ChooseBoard.getInstance().getBoard();
+
+        // Priorytet dla skoków nad innymi pionkami
         for (Field neighbor : neighbors) {
-            if (!neighbor.hasPiece()) {
-                return neighbor;    // Zwraca pierwsze znalezione wolne pole
+            if (neighbor.hasPiece()) { // Jeśli sąsiadujące pole jest zajęte, sprawdzamy możliwość skoku
+                int jumpRow = 2 * neighbor.getRow() - startField.getRow();
+                int jumpCol = 2 * neighbor.getCol() - startField.getCol();
+
+                // Sprawdzenie, czy skok mieści się w granicach planszy
+                if (jumpRow >= 0 && jumpRow < 17 && jumpCol >= 0 && jumpCol < 25) {
+                    try {
+                        Field jumpTarget = board.getSpecificField(jumpRow, jumpCol);
+                        if (jumpTarget != null && !jumpTarget.hasPiece()) {
+                            MovesManager movesManager = new MovesManager(startField, jumpTarget);
+                            if (movesManager.isValidMove()) { // Walidacja ruchu
+                                int distance = calculateDistanceToGoal(jumpTarget);
+                                if (distance < minDistance) { // Sprawdzenie, czy ruch przybliża do celu
+                                    minDistance = distance;
+                                    bestMove = jumpTarget;
+                                }
+                            }
+                        }
+                    } catch (IllegalArgumentException e) {
+                        sendMessage("[BOT] Nieprawidłowy skok, pomijam ruch: " + e.getMessage());
+                    }
+                }
             }
         }
-        return null;         // Brak dostępnych ruchów
+
+        // Jeśli skok nie jest możliwy, wybór zwykłego ruchu na sąsiednie pole
+        if (bestMove == null) {
+            for (Field neighbor : neighbors) {
+                if (!neighbor.hasPiece() && board.getFieldsInsideAStar().contains(neighbor)) {
+                    MovesManager movesManager = new MovesManager(startField, neighbor);
+                    if (movesManager.isValidMove()) {
+                        int distance = calculateDistanceToGoal(neighbor);
+                        if (distance < minDistance) { // Wybór ruchu minimalizującego dystans do celu
+                            minDistance = distance;
+                            bestMove = neighbor;
+                        }
+                    }
+                }
+            }
+        }
+
+        return bestMove;
+    }
+
+    /**
+     * Oblicza dystans Manhattanowski od danego pola do najbliższego celu bota.
+     * @param field Pole, dla którego liczymy dystans.
+     * @return Najmniejsza odległość do pola docelowego.
+     */
+    private int calculateDistanceToGoal(Field field) {
+        int minDistance = Integer.MAX_VALUE;
+
+        // Iteracja przez wszystkie pola docelowe bota
+        for (Field target : destinationFields) {
+            int distance = Math.abs(field.getRow() - target.getRow()) + Math.abs(field.getCol() - target.getCol());
+            // Jeśli obliczona odległość jest mniejsza niż aktualna minimalna, aktualizujemy wartość
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+
+        return minDistance;     // Zwracamy najmniejszą odległość
     }
 
     /**
@@ -127,12 +250,5 @@ public class Bot extends Mediator implements Runnable {
     @Override
     public void sendMessage(String message) {
         System.out.println("[BOT] " + message);
-    }
-
-    /**
-     * Zatrzymuje działanie bota, ustawiając flagę `running` na false.
-     */
-    public void terminate() {
-        running = false;
     }
 }

@@ -69,4 +69,11 @@ public class VictoryManager {
     public boolean isEnd() {                // Koniec jest wtedy kiedy jakiś gracz zostałby już sam
         return (whichPlace == numberOfPlayers - 1);
     }
+
+    /**
+     * Getter.
+     */
+    public Map<PieceColor, List<Field>> getDestinationHomesMap() {
+        return destinationHomesMap;
+    }
 }
