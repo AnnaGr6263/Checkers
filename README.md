@@ -40,6 +40,11 @@ mvn compile
 mvn exec:java -Dexec.mainClass="server.Server"
 ```
 ### Run the client in a separate terminal (each client requires its own terminal):
+##### Windows 
+```bash
+java -cp target/classes server.Client
+```
+#### Linux/MacOS
 ```bash
 mvn exec:java -Dexec.mainClass="server.Client"
 ```
