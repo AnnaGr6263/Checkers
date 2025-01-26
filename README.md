@@ -44,7 +44,7 @@ mvn exec:java -Dexec.mainClass="server.Server"
 ```bash
 java -cp target/classes server.Client
 ```
-#### Linux/MacOS
+##### Linux/MacOS
 ```bash
 mvn exec:java -Dexec.mainClass="server.Client"
 ```
