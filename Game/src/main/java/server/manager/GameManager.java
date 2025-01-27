@@ -8,6 +8,8 @@ import board.homes.DestinationHome;
 import board.homes.DestinationHomeYinAndYang;
 import GUI.GUI;
 import bot.Bot;
+import data.Game;
+import data.Move;
 import data.repositories.GameRepository;
 import data.repositories.MoveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ public class GameManager {
     @Autowired
     private MoveRepository moveRepository;
 
+    private Game currentGame;
 
     private static  volatile GameManager gameManagerInstance;   // Jedyna instancja klasy GameManager
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
@@ -475,5 +478,35 @@ public class GameManager {
      **/
     public VictoryManager getVictoryManager() {
         return victoryManager;
+    }
+
+
+    // Baza danych obsługa
+
+    public Game whenGameStarted(List<Mediator> players) {
+        currentGame = new Game();
+        currentGame.setGameStarted(true);
+        currentGame.setGameEnded(false);
+        currentGame.setNumberOfPlayers(players.size());
+
+        // skorzystanie z interfejsu, który rozszerza JpaRepository, dzięki temu mamy dostęp do takich metod jak np. save
+        currentGame = gameRepository.save(currentGame);
+        return currentGame;
+    }
+    public void recordMove(Mediator player, String startField, String endField) {
+        if (currentGame == null || !currentGame.isGameStarted()) {
+            throw new IllegalStateException("Game not started yet.");
+        }
+        Move move = new Move();
+        move.setStartPosition(startField);
+        move.setEndPosition(endField);
+
+        moveRepository.save(move);
+    }
+    public void whenGameEnded() {
+        if (currentGame != null && !currentGame.isGameEnded()) {
+            currentGame.setGameEnded(true);
+            gameRepository.save(currentGame); // Save the game state as ended
+        }
     }
 }

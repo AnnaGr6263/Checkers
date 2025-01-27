@@ -1,5 +1,6 @@
 package data;
 import jakarta.persistence.*;
+import server.Mediator;
 
 
 @Entity

@@ -29,6 +29,22 @@ public class Game {
     }
 
 
+    public void setGameEnded(boolean gameEnded) {
+        this.gameEnded = gameEnded;
+    }
+
+    public void setGameStarted(boolean gameStarted) {
+        this.gameStarted = gameStarted;
+    }
+
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    public boolean isGameEnded() {
+        return gameEnded;
+    }
+
     public int getNumberOfPlayers() {
         return numberOfPlayers;
     }
