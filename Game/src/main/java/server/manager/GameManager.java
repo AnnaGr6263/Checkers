@@ -8,6 +8,10 @@ import board.homes.DestinationHome;
 import board.homes.DestinationHomeYinAndYang;
 import GUI.GUI;
 import bot.Bot;
+import data.repositories.GameRepository;
+import data.repositories.MoveRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import server.ChooseBoard;
 import server.Mediator;
 import server.Observer;
@@ -18,7 +22,15 @@ import java.util.List;
 /**
  * Klasa GameMamager służąca do zarządzania grą
  */
+@Service
 public class GameManager {
+
+    // Potrzebne do bazy danych
+    @Autowired
+    private GameRepository gameRepository;
+    @Autowired
+    private MoveRepository moveRepository;
+
 
     private static  volatile GameManager gameManagerInstance;   // Jedyna instancja klasy GameManager
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
