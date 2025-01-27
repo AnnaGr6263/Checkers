@@ -157,7 +157,8 @@ public class GUI extends Application {
         drawPieces(); // Rysowanie pionków
 
         Scene scene = new Scene(root, 800, 600);
-        newStage.setTitle("Chinese Checkers - Player " + guiInstances.getLast().getColor().toString());
+        GUI lastGui = guiInstances.get(guiInstances.size() - 1);
+        newStage.setTitle("Chinese Checkers - Player " + lastGui.getColor().toString());
         newStage.setScene(scene);
         newStage.show();
     }
