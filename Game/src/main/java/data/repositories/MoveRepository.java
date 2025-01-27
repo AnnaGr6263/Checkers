@@ -1,0 +1,7 @@
+package data.repositories;
+
+import data.Game;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MoveRepository extends JpaRepository<Game, Long> {
+}
