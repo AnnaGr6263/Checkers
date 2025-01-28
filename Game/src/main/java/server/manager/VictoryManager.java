@@ -3,8 +3,10 @@ package server.manager;
 import board.Field;
 import board.enums.PieceColor;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Klasa VictoryManager odpowiadająca za obsługę wygranej w grze.
@@ -14,7 +16,7 @@ public class VictoryManager {
     private final Map<PieceColor, List<Field>> destinationHomesMap;
     private final int numberOfPlayers;
     private int whichPlace = 0;        // Licznik graczy, którzy ukończyli grę, bo wprowadzili wszystkie swoje pionki
-
+    private final Set<PieceColor> finishedPlayers = new HashSet<>(); // Gracze, którzy już ukończyli grę
     /**
      * Konstruktor.
      *
@@ -48,7 +50,13 @@ public class VictoryManager {
                 return false;
             }
         }
-        return true; // Wszystkie pola są zajęte przez pionki danego koloru, więc mamy wygraną
+
+        // Jeśli wszystkie warunki są spełnione, gracz wygrywa
+        if (!finishedPlayers.contains(pieceColor)) { // Sprawdzenie, czy gracz nie wygrał już wcześniej
+            finishedPlayers.add(pieceColor);
+            return true;
+        }
+        return false; // Gracz już wygrał, więc nie oznaczamy ponownie
     }
 
     /**
@@ -67,7 +75,7 @@ public class VictoryManager {
      * @return Prawdę gdy gra sie skończyła.
      */
     public boolean isEnd() {                // Koniec jest wtedy kiedy jakiś gracz zostałby już sam
-        return (whichPlace == numberOfPlayers - 1);
+        return finishedPlayers.size() == numberOfPlayers - 1;
     }
 
     /**

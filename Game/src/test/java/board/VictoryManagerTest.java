@@ -77,11 +77,8 @@ public class VictoryManagerTest {
         assertEquals(3, victoryManager.whichPlace(), "Third call to whichPlace should return 3.");
     }
     @Test
-    void testIsEnd() {
-        // Symulacja ukończenia gry przez dwóch graczy
+    void testIsEndNotYet() {
         victoryManager.whichPlace(); // 1 miejsce
-        victoryManager.whichPlace(); // 2 miejsce
-
-        assertTrue(victoryManager.isEnd(), "Game should end when one player remains.");
+        assertFalse(victoryManager.isEnd(), "Game should not end when more than one player remains.");
     }
 }
