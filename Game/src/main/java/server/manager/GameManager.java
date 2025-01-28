@@ -48,6 +48,7 @@ public class GameManager {
     /**
      * Prywatny konstruktor, ponieważ korzystamy ze wzorca projektowego Singleton
      */
+    @Autowired
     private GameManager(){ // Prywatny konstruktor
     }
 
@@ -57,6 +58,7 @@ public class GameManager {
      *
      * @return instancję GameManager
      */
+    @Autowired
     public static GameManager getInstance() {
         // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
         GameManager gameManager = gameManagerInstance;
@@ -266,6 +268,15 @@ public class GameManager {
         // Uruchomienie GUI dla każdego gracza
         GUI.launchForPlayers(humanPlayers.size(), piecesInGame);
 
+        // Zarejestrowanie do bazy danych początku gry
+        currentGame = new Game();
+        currentGame.setGameStarted(true);
+        currentGame.setGameEnded(false);
+        currentGame.setNumberOfPlayers(players.size());
+
+        // skorzystanie z interfejsu, który rozszerza JpaRepository, dzięki temu mamy dostęp do takich metod jak np. save
+        gameRepository.save(currentGame);
+
         // Powiadom pierwszego gracza o jego ruchu
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");
     }
@@ -348,6 +359,14 @@ public class GameManager {
         MovesManager movesManager = new MovesManager(startField, endField);
         if(movesManager.isValidMove()) {
             movesManager.performMove();         // Oddelegowanie całej logiki ruchu do MovesManager
+
+            int startX = startField.getRow();
+            int startY = startField.getCol();
+            int endX = endField.getRow();
+            int endY = endField.getCol();
+
+            recordMove(player, startX, startY, endX, endY);     // Zapisanie ruchu do bazy danych
+
             rulesManager.nextPlayer();          // Przejście do kolejnego gracza
 
             // Sprawdzenie wygranej
@@ -358,7 +377,7 @@ public class GameManager {
                 notifyObservers("Player with color " + rulesManager.getPlayerColor(player) + " takes " + victoryManager.whichPlace() +" place.");
                 if(victoryManager.isEnd()) {
                     notifyObservers("End of the game.");
-                    gameEnded = true;
+                    endGame();
                 }
             }
         } else {
@@ -440,7 +459,28 @@ public class GameManager {
 
             if (movesManager.isValidMove()) {
                 movesManager.performMove(); // Oddelegowanie całej logiki ruchu do MovesManager
+
+                int startX = selectedStartField.getRow();
+                int startY = selectedStartField.getCol();
+                int endX = selectedEndField.getRow();
+                int endY = selectedEndField.getCol();
+
+                recordMove(currentPlayer, startX, startY, endX, endY);     // Zapisanie ruchu do bazy danych
+
                 rulesManager.nextPlayer(); // Przejście do kolejnego gracza
+
+                // Sprawdzenie wygranej
+                if (victoryManager.checkVictory(rulesManager.getPlayerColor(currentPlayer))) {
+
+                    System.out.println("Checking victory for pieceColor: " + rulesManager.getPlayerColor(currentPlayer));
+
+                    notifyObservers("Player with color " + rulesManager.getPlayerColor(currentPlayer) + " takes " + victoryManager.whichPlace() +" place.");
+                    if(victoryManager.isEnd()) {
+                        notifyObservers("End of the game.");
+                        endGame();
+                    }
+                }
+
             } else {
                 currentPlayer.sendMessage("Invalid move.");
             }
@@ -455,6 +495,7 @@ public class GameManager {
     public void endGame() {
         if (!gameEnded) {
             gameEnded = true;
+            whenGameEnded();        // Zapisanie w bazie ukończenia gry
         }
     }
 
@@ -483,6 +524,12 @@ public class GameManager {
 
     // Baza danych obsługa
 
+    /**
+     * Metoda odpowiedzialna za zarejstrowanie nowej gry przez bazę danych.
+     *
+     * @param players Lista graczy
+     * @return Aktualna gra
+     */
     public Game whenGameStarted(List<Mediator> players) {
         currentGame = new Game();
         currentGame.setGameStarted(true);
@@ -490,19 +537,36 @@ public class GameManager {
         currentGame.setNumberOfPlayers(players.size());
 
         // skorzystanie z interfejsu, który rozszerza JpaRepository, dzięki temu mamy dostęp do takich metod jak np. save
-        currentGame = gameRepository.save(currentGame);
+        gameRepository.save(currentGame);
         return currentGame;
     }
-    public void recordMove(Mediator player, String startField, String endField) {
+
+    /**
+     * Metoda osdpowiedzialna za rejestrowanie pojedynczego ruchu do bazy danych.
+     *
+     * @param player Gracz wykoknujący ruch
+     * @param startX Wiersz/współrzędna X ruchu początkowego
+     * @param startY Kolumna/współrzędna Y ruchu początkowego
+     * @param endX Wiersz/współrzędna X ruchu końcowego
+     * @param endY Kolumna/współrzędna Y ruchu końcowego
+     */
+    public void recordMove(Mediator player, int startX, int startY, int endX, int endY) {
         if (currentGame == null || !currentGame.isGameStarted()) {
             throw new IllegalStateException("Game not started yet.");
         }
         Move move = new Move();
-        move.setStartPosition(startField);
-        move.setEndPosition(endField);
+        move.setStartPositionX(startX);
+        move.setStartPositionY(startY);
+        move.setEndPositionX(endX);
+        move.setEndPositionY(endY);
+        move.setGame(currentGame);
 
         moveRepository.save(move);
     }
+
+    /**
+     * Metoda wywoływana gdy gra się skończyła. Rejestruje w bazie danych koniec gry.
+     */
     public void whenGameEnded() {
         if (currentGame != null && !currentGame.isGameEnded()) {
             currentGame.setGameEnded(true);

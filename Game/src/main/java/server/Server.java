@@ -1,4 +1,6 @@
 package server;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import server.manager.GameManager;
 
 import java.io.IOException;
@@ -21,13 +23,14 @@ public class Server {
      * @param args Argumenty.
      */
     public static void main(String[] args) {
+
         try (ServerSocket serverSocket = new ServerSocket(4444)) {
             System.out.println("Server is listening on port 4444");
 
             while (true) {
                 Socket socket = serverSocket.accept();
                 if (connectedClients.get() >= MAX_CLIENTS) {
-                    rejectClient(socket); // Odrzucenie nowego połączenia, jeśli osiągnięto limit klientów
+                    rejectClient(socket); // Odrzucenie    nowego połączenia, jeśli osiągnięto limit klientów
                     continue;
                 }
 

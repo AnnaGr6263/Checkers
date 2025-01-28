@@ -1,6 +1,5 @@
 package data;
 import jakarta.persistence.*;
-import server.Mediator;
 
 
 @Entity
@@ -11,8 +10,10 @@ public class Move {
     private Long id;
 
 
-    private String startPosition;
-    private String endPosition;
+    private int startPositionX;
+    private int startPositionY;
+    private int endPositionX;
+    private int endPositionY;
 
     @ManyToOne
     @JoinColumn(name = "game_id")
@@ -28,20 +29,36 @@ public class Move {
     }
 
 
-    public String getStartPosition() {
-        return startPosition;
+    public int getEndPositionX() {
+        return endPositionX;
     }
 
-    public void setStartPosition(String startPosition) {
-        this.startPosition = startPosition;
+    public int getStartPositionX() {
+        return startPositionX;
     }
 
-    public String getEndPosition() {
-        return endPosition;
+    public void setStartPositionX(int startPositionX) {
+        this.startPositionX = startPositionX;
     }
 
-    public void setEndPosition(String endPosition) {
-        this.endPosition = endPosition;
+    public int getStartPositionY() {
+        return startPositionY;
+    }
+
+    public int getEndPositionY() {
+        return endPositionY;
+    }
+
+    public void setEndPositionX(int endPositionX) {
+        this.endPositionX = endPositionX;
+    }
+
+    public void setStartPositionY(int startPositionY) {
+        this.startPositionY = startPositionY;
+    }
+
+    public void setEndPositionY(int endPositionY) {
+        this.endPositionY = endPositionY;
     }
 
     public Game getGame() {

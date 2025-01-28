@@ -117,7 +117,7 @@ public class Bot extends Mediator implements Runnable {
                         sendMessage("[BOT] Performing move: " + command);
                         gameManager.handleCommand(this, command); // Wysłanie ruchu do systemu gry
 
-                        // eraz sprawdzamy wygraną dopiero po wykonaniu ruchu
+                        // teraz sprawdzamy wygraną dopiero po wykonaniu ruchu
                         if (hasBotWon()) {
                             gameManager.notifyObservers("Bot with color " + botColor +
                                     " takes " + gameManager.getVictoryManager().whichPlace() + " place.");
