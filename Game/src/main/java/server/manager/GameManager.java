@@ -58,6 +58,7 @@ public class GameManager {
      * @return instancję GameManager
      */
     public static GameManager getInstance() {
+
         // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
         GameManager gameManager = gameManagerInstance;
         if(gameManager != null) {
@@ -101,7 +102,7 @@ public class GameManager {
      * @param message Treść wiadomości
      */
     public void notifyObservers(String message) {
-        for (Observer observer : new ArrayList<>(observers)) {//new ArrayList<>(observers) - aby uniknąć ConcurrentModificationException
+        for (Observer observer : new ArrayList<>(observers)) {  //new ArrayList<>(observers) - aby uniknąć ConcurrentModificationException
             observer.update(message);
         }
     }

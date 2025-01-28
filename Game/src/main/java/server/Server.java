@@ -1,6 +1,7 @@
 package server;
 import data.repositories.GameRepository;
 import data.repositories.MoveRepository;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import server.manager.GameManager;
 
@@ -24,6 +25,9 @@ public class Server {
      * @param args Argumenty.
      */
     public static void main(String[] args) {
+
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        GameManager gameManager = (GameManager) context.getBean(GameManager.class);
 
         try (ServerSocket serverSocket = new ServerSocket(4444)) {
             System.out.println("Server is listening on port 4444");
