@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import server.manager.GameDataService;
 import server.manager.GameManager;
 
 import java.io.IOException;
@@ -27,8 +28,15 @@ public class Server implements CommandLineRunner {
     private static final int MAX_CLIENTS = 6; // Maksymalna liczba klientów
     private static final AtomicInteger connectedClients = new AtomicInteger(0); // Licznik klientów
 
+    //private final GameManager gameManager;
+    private final GameDataService gameDataService;
+
     @Autowired
-    private GameManager gameManager;
+    public Server(GameDataService gameDataService) {
+        // Inicjalizacja GameManager przy użyciu GameDataService
+        this.gameDataService = gameDataService;
+        GameManager.getInstance(gameDataService);
+    }
 
     /**
      * Metoda main.
@@ -40,8 +48,8 @@ public class Server implements CommandLineRunner {
         SpringApplication.run(Server.class, args);
 
     }
-    @Override
 
+    @Override
     public void run(String... args) throws Exception {
 
         System.out.println("Server is starting...");

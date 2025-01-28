@@ -14,6 +14,7 @@ public class Move {
     private int startPositionY;
     private int endPositionX;
     private int endPositionY;
+    private int player;
 
     @ManyToOne
     @JoinColumn(name = "game_id")

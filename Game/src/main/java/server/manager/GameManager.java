@@ -26,15 +26,10 @@ import java.util.List;
 /**
  * Klasa GameMamager służąca do zarządzania grą
  */
-@Component
+
 public class GameManager {
 
-    // Potrzebne do bazy danych
-    @Autowired
-    private GameRepository gameRepository;
-    @Autowired
-    private MoveRepository moveRepository;
-
+    private final GameDataService gameDataService;
     private Game currentGame;
 
     private static volatile GameManager gameManagerInstance;   // Jedyna instancja klasy GameManager
@@ -50,7 +45,8 @@ public class GameManager {
     /**
      * Prywatny konstruktor, ponieważ korzystamy ze wzorca projektowego Singleton
      */
-    private GameManager(){ // Prywatny konstruktor
+    private GameManager(GameDataService gameDataService){ // Prywatny konstruktor
+        this.gameDataService = gameDataService;
     }
 
     /**
@@ -58,10 +54,9 @@ public class GameManager {
      * instancję GameManager
      *
      * @return instancję GameManager
-     */
+     *//*
     public static GameManager getInstance() {
 
-        /*
         // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
         GameManager gameManager = gameManagerInstance;
         if(gameManager != null) {
@@ -72,9 +67,24 @@ public class GameManager {
                 gameManagerInstance = new GameManager();
             }
             return gameManagerInstance;
-        }*/
+        }
+    }*/
+
+    // Dodanie Springowego zarządzania zależnością
+    public static GameManager getInstance(GameDataService gameDataService) {
         if (gameManagerInstance == null) {
-            throw new IllegalStateException("GameManager has not been initialized by Spring.");
+            synchronized (GameManager.class) {
+                if (gameManagerInstance == null) {
+                    gameManagerInstance = new GameManager(gameDataService);
+                }
+            }
+        }
+        return gameManagerInstance;
+    }
+
+    public static GameManager getInstance() {
+        if (gameManagerInstance == null) {
+            throw new IllegalStateException("GameManager has not been initialized. Please call getInstance(GameDataService) first.");
         }
         return gameManagerInstance;
     }
@@ -274,14 +284,8 @@ public class GameManager {
         // Uruchomienie GUI dla każdego gracza
         GUI.launchForPlayers(humanPlayers.size(), piecesInGame);
 
-        // Zarejestrowanie do bazy danych początku gry
-        currentGame = new Game();
-        currentGame.setGameStarted(true);
-        currentGame.setGameEnded(false);
-        currentGame.setNumberOfPlayers(players.size());
-
-        // skorzystanie z interfejsu, który rozszerza JpaRepository, dzięki temu mamy dostęp do takich metod jak np. save
-        gameRepository.save(currentGame);
+        // Rejestracja gry w bazie danych
+        currentGame = gameDataService.whenGameStarted(players.size());
 
         // Powiadom pierwszego gracza o jego ruchu
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");
@@ -371,7 +375,7 @@ public class GameManager {
             int endX = endField.getRow();
             int endY = endField.getCol();
 
-            recordMove(player, startX, startY, endX, endY);     // Zapisanie ruchu do bazy danych
+            gameDataService.recordMove(currentGame, startX, startY, endX, endY);     // Zapisanie ruchu do bazy danych
 
             rulesManager.nextPlayer();          // Przejście do kolejnego gracza
 
@@ -471,7 +475,7 @@ public class GameManager {
                 int endX = selectedEndField.getRow();
                 int endY = selectedEndField.getCol();
 
-                recordMove(currentPlayer, startX, startY, endX, endY);     // Zapisanie ruchu do bazy danych
+                gameDataService.recordMove(currentGame, startX, startY, endX, endY);     // Zapisanie ruchu do bazy danych
 
                 rulesManager.nextPlayer(); // Przejście do kolejnego gracza
 
@@ -501,7 +505,7 @@ public class GameManager {
     public void endGame() {
         if (!gameEnded) {
             gameEnded = true;
-            whenGameEnded();        // Zapisanie w bazie ukończenia gry
+            gameDataService.whenGameEnded(currentGame);        // Zapisanie w bazie ukończenia gry
         }
     }
 
@@ -527,56 +531,4 @@ public class GameManager {
         return victoryManager;
     }
 
-
-    // Baza danych obsługa
-
-    /**
-     * Metoda odpowiedzialna za zarejstrowanie nowej gry przez bazę danych.
-     *
-     * @param players Lista graczy
-     * @return Aktualna gra
-     */
-    public Game whenGameStarted(List<Mediator> players) {
-        currentGame = new Game();
-        currentGame.setGameStarted(true);
-        currentGame.setGameEnded(false);
-        currentGame.setNumberOfPlayers(players.size());
-
-        // skorzystanie z interfejsu, który rozszerza JpaRepository, dzięki temu mamy dostęp do takich metod jak np. save
-        gameRepository.save(currentGame);
-        return currentGame;
-    }
-
-    /**
-     * Metoda osdpowiedzialna za rejestrowanie pojedynczego ruchu do bazy danych.
-     *
-     * @param player Gracz wykoknujący ruch
-     * @param startX Wiersz/współrzędna X ruchu początkowego
-     * @param startY Kolumna/współrzędna Y ruchu początkowego
-     * @param endX Wiersz/współrzędna X ruchu końcowego
-     * @param endY Kolumna/współrzędna Y ruchu końcowego
-     */
-    public void recordMove(Mediator player, int startX, int startY, int endX, int endY) {
-        if (currentGame == null || !currentGame.isGameStarted()) {
-            throw new IllegalStateException("Game not started yet.");
-        }
-        Move move = new Move();
-        move.setStartPositionX(startX);
-        move.setStartPositionY(startY);
-        move.setEndPositionX(endX);
-        move.setEndPositionY(endY);
-        move.setGame(currentGame);
-
-        moveRepository.save(move);
-    }
-
-    /**
-     * Metoda wywoływana gdy gra się skończyła. Rejestruje w bazie danych koniec gry.
-     */
-    public void whenGameEnded() {
-        if (currentGame != null && !currentGame.isGameEnded()) {
-            currentGame.setGameEnded(true);
-            gameRepository.save(currentGame); // Save the game state as ended
-        }
-    }
 }

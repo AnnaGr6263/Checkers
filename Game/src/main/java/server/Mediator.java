@@ -1,5 +1,8 @@
 package server;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import server.manager.GameManager;
 import java.io.*;
 import java.net.Socket;
@@ -11,7 +14,7 @@ import java.net.Socket;
 public class Mediator extends Thread implements Observer {
     private final Socket socket; // Połączenie z klientem
     private PrintWriter out; // Strumień wyjściowy do klienta
-    private final GameManager gameManager = GameManager.getInstance(); // Menadżer gry
+    private GameManager gameManager = GameManager.getInstance();
 
     /**
      * Konstruktor.
