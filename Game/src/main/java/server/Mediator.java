@@ -1,8 +1,5 @@
 package server;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import server.manager.GameManager;
 import java.io.*;
 import java.net.Socket;

@@ -10,12 +10,9 @@ import GUI.GUI;
 import bot.Bot;
 import data.entities.Game;
 import data.entities.Move;
-import data.repositories.GameRepository;
-import data.repositories.MoveRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+import GUI.GUIReplay;
+import data.entities.Setup;
+import javafx.application.Platform;
 import server.ChooseBoard;
 import server.Mediator;
 import server.Observer;
@@ -48,28 +45,6 @@ public class GameManager {
     private GameManager(GameDataService gameDataService){ // Prywatny konstruktor
         this.gameDataService = gameDataService;
     }
-
-    /**
-     * Bezpieczna dla wielowątkowości metoda getInstance() zwracająca nam jedyną istniejącą w czasie gry
-     * instancję GameManager
-     *
-     * @return instancję GameManager
-     *//*
-    public static GameManager getInstance() {
-
-        // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
-        GameManager gameManager = gameManagerInstance;
-        if(gameManager != null) {
-            return gameManager;
-        }
-        synchronized (GameManager.class) {
-            if(gameManagerInstance == null) {
-                gameManagerInstance = new GameManager();
-            }
-            return gameManagerInstance;
-        }
-    }*/
-
     // Dodanie Springowego zarządzania zależnością
     public static GameManager getInstance(GameDataService gameDataService) {
         if (gameManagerInstance == null) {
@@ -208,6 +183,11 @@ public class GameManager {
             processMove(player, command);
         } else if (command.equalsIgnoreCase("skip")) {
             skipTurn(player);
+        } else if (command.equalsIgnoreCase("replay game")) {
+            showSavedGames(player);
+        } else if (command.startsWith("replay game ")) {
+            Long gameId = Long.parseLong(command.split(" ")[2]);
+            replayGame(player, gameId);
         }
     }
 
@@ -287,6 +267,16 @@ public class GameManager {
         // Rejestracja gry w bazie danych
         currentGame = gameDataService.whenGameStarted(players.size(), yinAndYangManager.isYinAndYangEnabled());
 
+        // Po fillWithPieces jednym albo drugim przyszła pora na zapisanie tych ustawień początkowych w bazie danych
+        for(Field field : ChooseBoard.getInstance().getBoard().getFieldsInsideAStar()) {
+            Piece piece = field.getPiece();
+            if(piece != null) {
+                String color = piece.getColor().toString();
+                int posX = field.getRow();
+                int posY = field.getCol();
+                gameDataService.recordSetup(currentGame, color, posX, posY);
+            }
+        }
         // Powiadom pierwszego gracza o jego ruchu
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");
     }
@@ -529,6 +519,89 @@ public class GameManager {
      **/
     public VictoryManager getVictoryManager() {
         return victoryManager;
+    }
+
+    private void showSavedGames(Mediator player) {
+        List<Game> savedGames = gameDataService.getSavedGames();
+        if (savedGames.isEmpty()) {
+            player.sendMessage("No saved games available.");
+            return;
+        }
+        StringBuilder message = new StringBuilder("Saved games:\n");
+        for (Game game : savedGames) {
+            message.append(String.format("ID: %d, Players: %d, Yin and Yang: %s\n",
+                    game.getId(), game.getNumberOfPlayers(), game.isYingAndYangVariantEnabled() ? "Yes" : "No"));
+        }
+        player.sendMessage(message.toString());
+    }
+
+    private void replayGame(Mediator player, Long gameId) {
+        List<Move> moves = gameDataService.getMovesForGame(gameId);
+        if (moves.isEmpty()) {
+            player.sendMessage("No moves found for the selected game.");
+            return;
+        }
+        // Pobranie informacji o grze
+        Game selectedGame = gameDataService.getGameById(gameId);
+        if (selectedGame == null) {
+            player.sendMessage("Game not found.");
+            return;
+        }
+
+        int numberOfPlayers = selectedGame.getNumberOfPlayers();
+        boolean isYinAndYang = selectedGame.isYingAndYangVariantEnabled();
+
+        // Tworzenie planszy BigBoard
+        BoardSetup bigBoard = new BigBoard(); // Zainicjuj planszę BigBoard
+        bigBoard.boardGenerator();            // Upewnij się, że metoda poprawnie inicjalizuje planszę
+
+        // Pobranie ustawień początkowych pionków
+        List<Setup> setups = gameDataService.getInitialSetup(gameId);
+        if (setups.isEmpty()) {
+            player.sendMessage("No initial setup found for the selected game.");
+            return;
+        }
+
+        // Odtworzenie ustawień początkowych na planszy
+        for (Setup setup : setups) {
+            Field field = bigBoard.getSpecificField(setup.getStartPositionX(), setup.getStartPositionY());
+            if (field != null) {
+                Piece piece = new Piece(PieceColor.valueOf(setup.getPieceColor()));
+                field.setPiece(piece);
+            }
+        }
+
+        // Uruchomienie GUIReplay
+        GUIReplay.setBoard(bigBoard); // Ustaw planszę w GUIReplay
+        GUIReplay.launchForReplay();
+
+
+        player.sendMessage("Replaying game...");
+
+        // Symulowanie ruchów
+        GUIReplay replayInstance = new GUIReplay();
+        replayInstance.setBoard(bigBoard);
+
+        // Symulowanie ruchów w GUIReplay
+        for (Move move : moves) {
+            int startX = move.getStartPositionX();
+            int startY = move.getStartPositionY();
+            int endX = move.getEndPositionX();
+            int endY = move.getEndPositionY();
+
+            // Aktualizacja planszy w GUI
+            Platform.runLater(() -> {
+                GUIReplay.animateMove(startX, startY, endX, endY);
+            });
+
+            try {
+                Thread.sleep(1000); // Opóźnienie między ruchami dla efektu animacji
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+        }
+        player.sendMessage("Replay completed.");
     }
 
 }

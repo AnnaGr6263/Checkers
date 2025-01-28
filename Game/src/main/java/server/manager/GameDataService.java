@@ -2,10 +2,14 @@ package server.manager;
 
 import data.entities.Game;
 import data.entities.Move;
+import data.entities.Setup;
 import data.repositories.GameRepository;
 import data.repositories.MoveRepository;
+import data.repositories.SetupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 @Component
@@ -13,11 +17,13 @@ public class GameDataService {
 
     private final GameRepository gameRepository;
     private final MoveRepository moveRepository;
+    private final SetupRepository setupRepository;
 
     @Autowired
-    public GameDataService(final GameRepository gameRepository, final MoveRepository moveRepository) {
+    public GameDataService(final GameRepository gameRepository, final MoveRepository moveRepository, final SetupRepository setupRepository) {
         this.gameRepository = gameRepository;
         this.moveRepository = moveRepository;
+        this.setupRepository = setupRepository;
     }
 
 
@@ -60,6 +66,16 @@ public class GameDataService {
         moveRepository.save(move);
     }
 
+    public void recordSetup(Game game, String pieceColor, int posX, int posY) {
+        Setup setup = new Setup();
+        setup.setPieceColor(pieceColor);
+        setup.setGame(game);
+        setup.setStartPositionX(posX);
+        setup.setStartPositionY(posY);
+
+        setupRepository.save(setup);
+    }
+
     /**
      * Metoda wywoływana gdy gra się skończyła. Rejestruje w bazie danych koniec gry.
      */
@@ -69,4 +85,30 @@ public class GameDataService {
             gameRepository.save(currentGame); // Save the game state as ended
         }
     }
+    /**
+     * Pobiera wszystkie ruchy dla danej gry.
+     *
+     * @param gameId Identyfikator gry.
+     * @return Lista ruchów w kolejności ich wykonania.
+     */
+    public List<Move> getMovesForGame(Long gameId) {
+        return moveRepository.findByGameId(gameId);
+    }
+    public List<Game> getSavedGames() {
+        return gameRepository.findAll();
+    }
+    public Game getGameById(Long gameId) {
+        return gameRepository.findById(gameId).orElse(null);
+    }
+
+    public void saveInitialSetup(Game game, List<Setup> setups) {
+        for (Setup setup : setups) {
+            setup.setGame(game);
+            setupRepository.save(setup);
+        }
+    }
+    public List<Setup> getInitialSetup(Long gameId) {
+        return setupRepository.findByGameId(gameId);
+    }
+
 }

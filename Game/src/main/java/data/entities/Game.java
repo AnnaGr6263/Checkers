@@ -33,6 +33,10 @@ public class Game {
         this.yingAndYangEnabled = yingAndYangEnabled;
     }
 
+    public boolean isYingAndYangVariantEnabled() {
+        return yingAndYangEnabled;
+    }
+
     public void setGameEnded(boolean gameEnded) {
         this.gameEnded = gameEnded;
     }
