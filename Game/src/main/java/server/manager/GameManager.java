@@ -603,5 +603,4 @@ public class GameManager {
         }
         player.sendMessage("Replay completed.");
     }
-
 }

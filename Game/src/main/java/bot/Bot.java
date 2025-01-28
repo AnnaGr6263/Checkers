@@ -46,13 +46,13 @@ public class Bot extends Mediator implements Runnable {
             // Bot wykonuje ruchy tylko jeśli gra się rozpoczęła i jest jego tura
             if (gameManager.isGameStarted() && gameManager.getCurrentPlayer() == this) {
                 try {
-                    moveLock.lock();        // Zabezpieczenie, aby tylko jeden bot mógł wykonywać ruch na raz
+
                     makeMove();
-                } finally {
-                    moveLock.unlock();
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
-
             try {
                 Thread.sleep(500);      // Czekanie przed ponownym sprawdzeniem tury, aby nie obciążać CPU
             } catch (InterruptedException e) {
