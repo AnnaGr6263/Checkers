@@ -1,7 +1,8 @@
-package data;
+package data.entities;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -15,8 +16,8 @@ public class Game {
     private boolean yingAndYangEnabled;
     private int numberOfPlayers;
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
-    private List<Move> moves;
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Move> moves = new ArrayList<>();
 
 
     // Gettery i settery

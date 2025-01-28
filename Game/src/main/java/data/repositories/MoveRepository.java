@@ -1,7 +1,6 @@
 package data.repositories;
 
-import data.Game;
-import data.Move;
+import data.entities.Move;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

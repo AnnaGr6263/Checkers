@@ -8,11 +8,13 @@ import board.homes.DestinationHome;
 import board.homes.DestinationHomeYinAndYang;
 import GUI.GUI;
 import bot.Bot;
-import data.Game;
-import data.Move;
+import data.entities.Game;
+import data.entities.Move;
 import data.repositories.GameRepository;
 import data.repositories.MoveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import server.ChooseBoard;
 import server.Mediator;
@@ -24,7 +26,7 @@ import java.util.List;
 /**
  * Klasa GameMamager służąca do zarządzania grą
  */
-@Service
+@Component
 public class GameManager {
 
     // Potrzebne do bazy danych
@@ -35,7 +37,7 @@ public class GameManager {
 
     private Game currentGame;
 
-    private static  volatile GameManager gameManagerInstance;   // Jedyna instancja klasy GameManager
+    private static volatile GameManager gameManagerInstance;   // Jedyna instancja klasy GameManager
     private final List<Observer> observers = new ArrayList<>(); // Lista obserwatorów
     private final List<Mediator> players = new ArrayList<>();   // Lista graczy
     private boolean gameStarted = false;
@@ -59,6 +61,7 @@ public class GameManager {
      */
     public static GameManager getInstance() {
 
+        /*
         // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
         GameManager gameManager = gameManagerInstance;
         if(gameManager != null) {
@@ -69,7 +72,11 @@ public class GameManager {
                 gameManagerInstance = new GameManager();
             }
             return gameManagerInstance;
+        }*/
+        if (gameManagerInstance == null) {
+            throw new IllegalStateException("GameManager has not been initialized by Spring.");
         }
+        return gameManagerInstance;
     }
 
     /**

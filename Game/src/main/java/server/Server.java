@@ -1,8 +1,14 @@
 package server;
 import data.repositories.GameRepository;
 import data.repositories.MoveRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import server.manager.GameManager;
 
 import java.io.IOException;
@@ -14,10 +20,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Klasa Server: zarządza połączeniami klientów i odpowiada za komunikację między nimi.
  */
-public class Server {
+@SpringBootApplication(scanBasePackages = {"server", "data.repositories", "server.manager"})
+@EnableJpaRepositories(basePackages = "data.repositories")
+@EntityScan(basePackages = "data.entities")
+public class Server implements CommandLineRunner {
     private static final int MAX_CLIENTS = 6; // Maksymalna liczba klientów
     private static final AtomicInteger connectedClients = new AtomicInteger(0); // Licznik klientów
-    private static final GameManager gameManager = GameManager.getInstance();
+
+    @Autowired
+    private GameManager gameManager;
 
     /**
      * Metoda main.
@@ -26,9 +37,14 @@ public class Server {
      */
     public static void main(String[] args) {
 
-        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-        GameManager gameManager = (GameManager) context.getBean(GameManager.class);
+        SpringApplication.run(Server.class, args);
 
+    }
+    @Override
+
+    public void run(String... args) throws Exception {
+
+        System.out.println("Server is starting...");
         try (ServerSocket serverSocket = new ServerSocket(4444)) {
             System.out.println("Server is listening on port 4444");
 
