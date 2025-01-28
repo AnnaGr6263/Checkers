@@ -29,11 +29,12 @@ public class GameDataService {
      * @param numberOfPlayers Lista graczy
      * @return Aktualna gra
      */
-    public Game whenGameStarted(int numberOfPlayers) {
+    public Game whenGameStarted(int numberOfPlayers, boolean isYingAndYangEnabled) {
         Game currentGame = new Game();
         currentGame.setGameStarted(true);
         currentGame.setGameEnded(false);
         currentGame.setNumberOfPlayers(numberOfPlayers);
+        currentGame.setYingAndYangEnabled(isYingAndYangEnabled);
 
         // skorzystanie z interfejsu, który rozszerza JpaRepository, dzięki temu mamy dostęp do takich metod jak np. save
         return gameRepository.save(currentGame);
@@ -68,7 +69,4 @@ public class GameDataService {
             gameRepository.save(currentGame); // Save the game state as ended
         }
     }
-
-
-
 }

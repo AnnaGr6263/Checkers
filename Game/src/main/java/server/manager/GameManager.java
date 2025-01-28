@@ -285,7 +285,7 @@ public class GameManager {
         GUI.launchForPlayers(humanPlayers.size(), piecesInGame);
 
         // Rejestracja gry w bazie danych
-        currentGame = gameDataService.whenGameStarted(players.size());
+        currentGame = gameDataService.whenGameStarted(players.size(), yinAndYangManager.isYinAndYangEnabled());
 
         // Powiadom pierwszego gracza o jego ruchu
         rulesManager.getCurrentPlayer().sendMessage("It's your turn!");

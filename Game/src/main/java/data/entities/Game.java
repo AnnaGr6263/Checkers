@@ -29,6 +29,9 @@ public class Game {
         this.id = id;
     }
 
+    public void setYingAndYangEnabled(boolean yingAndYangEnabled) {
+        this.yingAndYangEnabled = yingAndYangEnabled;
+    }
 
     public void setGameEnded(boolean gameEnded) {
         this.gameEnded = gameEnded;
