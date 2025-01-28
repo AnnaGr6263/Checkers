@@ -1,6 +1,7 @@
 package server;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import data.repositories.GameRepository;
+import data.repositories.MoveRepository;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import server.manager.GameManager;
 
 import java.io.IOException;

@@ -48,7 +48,6 @@ public class GameManager {
     /**
      * Prywatny konstruktor, ponieważ korzystamy ze wzorca projektowego Singleton
      */
-    @Autowired
     private GameManager(){ // Prywatny konstruktor
     }
 
@@ -58,7 +57,6 @@ public class GameManager {
      *
      * @return instancję GameManager
      */
-    @Autowired
     public static GameManager getInstance() {
         // Zastosowanie double-checked locking. W wypadku gdy wiele wątków próbuje dostać się do instancji tej klasy
         GameManager gameManager = gameManagerInstance;
