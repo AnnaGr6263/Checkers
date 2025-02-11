@@ -1,5 +1,4 @@
 package bot;
-
 import board.BoardSetup;
 import board.homes.DestinationHome;
 import server.Mediator;
@@ -10,7 +9,6 @@ import board.enums.PieceColor;
 import server.ChooseBoard;
 import server.manager.MovesManager;
 import server.manager.VictoryManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -205,7 +203,7 @@ public class Bot extends Mediator implements Runnable {
                                 int distance = calculateDistanceToGoal(jumpTarget);
                                 if (distance < minDistance) { // Sprawdzenie, czy ruch przybliża do celu
                                     minDistance = distance;
-                                    bestMove = jumpTarget;
+                                    bestMove = jumpTarget; // Aktualizacja najlepszego ruchu
                                 }
                             }
                         }
