@@ -28,6 +28,13 @@ Algorithmic Computer Science at Wroclaw University of Science and Technology.
 5. A **class diagram** to illustrate the application's function
 6. **Documentation** was generated using JavaDoc.
 ---
+## Functional Requirements for 3rd Iteration
+1. The game can have **bot** player joining, operating on the server. 
+Create a sample bot implementation that makes at least **reasonably sensible moves**.
+2. The Chinese Checkers game is extended to **support saving game data in a database** using the **Spring** framework. 
+The **database** is able to record individual games and moves within each game. 
+Additionally, the application is capable of **replaying a game** based on the saved data in the database.
+---
 ## How to run it:
 ### Clone the repository, and run the following commands in your terminal:
 ```bash
@@ -40,10 +47,6 @@ mvn compile
 mvn exec:java -Dexec.mainClass="server.Server"
 ```
 ### Run the client in a separate terminal (each client requires its own terminal):
-##### Windows 
-```bash
-java -cp target/classes server.Client
-```
 ##### Linux/MacOS
 ```bash
 mvn exec:java -Dexec.mainClass="server.Client"
